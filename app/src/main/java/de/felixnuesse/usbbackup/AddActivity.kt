@@ -4,7 +4,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.DocumentsContract
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -46,9 +49,11 @@ class AddActivity : AppCompatActivity() {
             insets
         }
 
-        binding.sourceUriFolderButton.setOnClickListener { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), SOURCE_REQUEST_ID) }
-        binding.targetUriFolderButton.setOnClickListener { startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), TARGET_REQUEST_ID) }
+        binding.sourceUriFolderButton.setOnClickListener { pick(SOURCE_REQUEST_ID) }
+        binding.targetUriFolderButton.setOnClickListener { pick(TARGET_REQUEST_ID) }
         binding.sourceUriFileButton.setOnClickListener { openDoc(SOURCE_REQUEST_ID) }
+
+        binding.nameTextfield.addTextChangedListener(getUpdateableTextWatcher())
 
 
         binding.saveFab.setOnClickListener {
@@ -58,13 +63,17 @@ class AddActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
                     val db = AppDatabase.Companion.getDatabase(this@AddActivity)
-                    var backup = BackupTask.new("NameOfTask", mSourceUri.toString(), mTargetUri.toString())
+                    var backup = BackupTask.new(binding.nameTextfield.text.toString(), mSourceUri.toString(), mTargetUri.toString())
                     db.backupDao().insert(backup)
                 }
             }
             finish()
         }
 
+    }
+
+    private fun pick(id: Int) {
+        startActivityForResult(StorageUtils.getInitialTreeIntent(this), id)
     }
 
     private fun openDoc(id: Int) {
@@ -74,13 +83,22 @@ class AddActivity : AppCompatActivity() {
         startActivityForResult(intent, id)
     }
 
-
     private fun updateUi() {
-        binding.sourceUri.text = mSourceUri.toString()
-        setUriMetadata(binding.sourceUriMetadata, mSourceUri)
+        if (mSourceUri != null && mTargetUri != null && !binding.nameTextfield.text.toString().isBlank()) {
+            binding.saveFab.visibility = View.VISIBLE
+        } else {
+            binding.saveFab.visibility = View.INVISIBLE
+        }
 
-        binding.targetUri.text = mTargetUri.toString()
-        setUriMetadata(binding.targetUriMetadata, mTargetUri)
+        if(mSourceUri!=null) {
+            binding.sourceUri.text = mSourceUri.toString()
+            setUriMetadata(binding.sourceUriMetadata, mSourceUri)
+        }
+
+        if(mTargetUri!=null) {
+            binding.targetUri.text = mTargetUri.toString()
+            setUriMetadata(binding.targetUriMetadata, mTargetUri)
+        }
     }
 
     private fun setUriMetadata(view: TextView, uri: Uri?) {
@@ -88,7 +106,6 @@ class AddActivity : AppCompatActivity() {
             var id = getStorageId(uri)
             try {
                 val folder = DocumentFile.fromTreeUri(this, uri)
-
                 view.text = "$id: ${folder?.name}"
             } catch (e: Exception) {
                 val file = DocumentFile.fromSingleUri(this, uri)
@@ -96,7 +113,6 @@ class AddActivity : AppCompatActivity() {
             }
         }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
@@ -113,5 +129,15 @@ class AddActivity : AppCompatActivity() {
     fun persist(uri: Uri) {
         val takeFlags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         applicationContext.contentResolver.takePersistableUriPermission(uri, takeFlags)
+    }
+
+    fun getUpdateableTextWatcher(): TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                updateUi()
+            }
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        }
     }
 }

@@ -1,10 +1,12 @@
 package de.felixnuesse.usbbackup
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,6 +31,11 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     private lateinit var mDb: AppDatabase
     private lateinit var mTaskDao: BackupTaskDao
 
+
+    private val pushNotificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
+        // todo: handle
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -39,6 +46,8 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        requestNotificationPermissions()
 
         binding.addFab.setOnClickListener {
             startActivity(Intent(this, AddActivity::class.java))
@@ -114,5 +123,9 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
         }
     }
 
-
+    private fun requestNotificationPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pushNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 }

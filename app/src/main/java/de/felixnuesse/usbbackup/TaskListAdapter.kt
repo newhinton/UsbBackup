@@ -9,6 +9,7 @@ import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
+import de.felixnuesse.usbbackup.worker.BackupWorker
 
 
 class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context, private val mPopupCallback: PopupCallback) : RecyclerView.Adapter<TaskListAdapter.Row>() {
@@ -39,6 +40,10 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
             if(StorageUtils.get(mContext, task.targetUri.toUri()) == null) {
                 binding.layoutDiskAvailable.visibility = View.GONE
+            }
+
+            binding.startBackup.setOnClickListener {
+                BackupWorker.now(mContext, task.id!!)
             }
 
         }

@@ -7,28 +7,36 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/nameTextfield"
-        android:layout_width="wrap_content"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/nameInput"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:ems="10"
-        android:inputType="text"
-        android:text="Name"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/nameTextfield"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title of the Task" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         app:cardCornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nameTextfield">
+        app:layout_constraintTop_toBottomOf="@+id/nameInput">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -41,7 +49,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                android:text="TextView"
+                android:singleLine="true"
+                android:text="Select either a folder or a file"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFileButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +60,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="TextView"
+                android:singleLine="true"
+                android:text=""
                 app:layout_constraintEnd_toEndOf="@+id/sourceUri"
                 app:layout_constraintStart_toStartOf="@+id/sourceUri"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUri" />
@@ -61,10 +71,11 @@
                 android:id="@+id/sourceUriFileButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="0dp"
                 android:layout_marginEnd="8dp"
+                android:minWidth="0dp"
                 app:icon="@drawable/round_insert_drive_file_24"
                 app:iconPadding="0dp"
+                app:iconTint="?iconTint"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
                 app:layout_constraintTop_toTopOf="@+id/sourceUri" />
 
@@ -77,6 +88,7 @@
                 android:minWidth="0dp"
                 app:icon="@drawable/round_folder_24"
                 app:iconPadding="0dp"
+                app:iconTint="?iconTint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
 
@@ -85,6 +97,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                app:iconTint="@color/primary"
+                app:tint="@color/primary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUriMetadata"
@@ -96,7 +110,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
-                android:text="TextView"
+                android:singleLine="true"
+                android:text="Select a targetfolder"
                 app:layout_constraintEnd_toStartOf="@+id/targetUriFolderButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
@@ -106,7 +121,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="TextView"
+                android:singleLine="true"
                 app:layout_constraintEnd_toEndOf="@+id/targetUri"
                 app:layout_constraintStart_toStartOf="@+id/targetUri"
                 app:layout_constraintTop_toBottomOf="@+id/targetUri" />
@@ -118,6 +133,7 @@
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/round_folder_24"
+                app:iconTint="?iconTint"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/targetUri" />
@@ -130,9 +146,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:layout_marginBottom="32dp"
-        android:clickable="true"
+        android:clickable="false"
+        android:enabled="true"
+        android:visibility="invisible"
+        app:backgroundTint="@color/primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/round_save_24" />
+        app:srcCompat="@drawable/round_save_24"
+        app:tint="?iconTint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

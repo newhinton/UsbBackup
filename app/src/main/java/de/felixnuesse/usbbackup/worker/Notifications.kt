@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import de.felixnuesse.usbbackup.R
 
 
 class Notifications(private var context: Context) {
@@ -16,12 +17,12 @@ class Notifications(private var context: Context) {
     val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     companion object {
-        private val NOTIFICATION_CHANNEL_ID = "async_archive_notification_channel"
+        private val NOTIFICATION_CHANNEL_ID = "backup_worker_notifications"
         private val NOTIFICATION_ID = 5691
     }
 
 
-    fun notifyPendingArchivalDone(title: String) {
+    fun showNotification(title: String, message: String) {
 
         NotificationManagerCompat.from(context).areNotificationsEnabled()
 
@@ -31,7 +32,9 @@ class Notifications(private var context: Context) {
 
         val mBuilder = NotificationCompat.Builder(context)
             .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setContentText("We archived: $title")
+            .setSmallIcon(R.drawable.security_key_24px)
+            .setContentTitle(title)
+            .setContentText(message)
             .setAutoCancel(true)
 
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build())
@@ -43,7 +46,7 @@ class Notifications(private var context: Context) {
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
-            "test",
+            "Backup Worker Channel",
             NotificationManager.IMPORTANCE_LOW
         )
 

@@ -12,8 +12,12 @@ class UriUtils {
                 val id = DocumentsContract.getTreeDocumentId(uri)
                 return id.toString().split(":")[0]
             } catch (e: Exception) {
-                val id = DocumentsContract.getDocumentId(uri)
-                return id.toString().split(":")[0]
+                try {
+                    val id = DocumentsContract.getDocumentId(uri)
+                    return id.toString().split(":")[0]
+                } catch (e: Exception) {
+                    return ""
+                }
             }
         }
 
