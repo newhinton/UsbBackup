@@ -26,5 +26,15 @@ class UriUtils {
                 return true
             }
         }
+
+        fun getName(context: Context, uri: Uri): String {
+            try {
+                val folder = DocumentFile.fromTreeUri(context, uri)
+                return folder?.name.toString()
+            } catch (e: Exception) { }
+
+            val file = DocumentFile.fromSingleUri(context, uri)
+            return file?.name.toString()
+        }
     }
 }

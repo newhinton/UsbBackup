@@ -31,30 +31,129 @@
 
             <TextView
                 android:id="@+id/title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="TextView"
+                app:layout_constraintEnd_toStartOf="@+id/moreButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/source"
+                android:id="@+id/labelSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="TextView"
+                android:text="Source:"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <TextView
-                android:id="@+id/target"
+                android:id="@+id/source"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="TextView"
+                app:layout_constraintEnd_toStartOf="@+id/moreButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelSource" />
+
+            <TextView
+                android:id="@+id/labelTarget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="TextView"
+                android:text="Target:"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/source" />
+
+            <TextView
+                android:id="@+id/target"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="TextView"
+                app:layout_constraintEnd_toEndOf="@+id/source"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/labelTarget" />
+
+            <ImageView
+                android:id="@+id/moreButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:scaleType="centerInside"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/round_more_vert_24" />
+
+            <LinearLayout
+                android:id="@+id/layoutNoPassword"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/target">
+
+                <ImageView
+                    android:id="@+id/imageView3"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:srcCompat="@drawable/round_lock_open_24"
+                    app:tint="#D00000" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Warning! No password set. Backup will be unencrypted!"
+                    android:textColor="#D00000" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutDiskAvailable"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutNoPassword">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/harddisk_check" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Media Available. Click to make a backup!" />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/startBackup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:minWidth="0dp"
+                    app:icon="@drawable/round_backup_24"
+                    app:iconPadding="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
+            </LinearLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>

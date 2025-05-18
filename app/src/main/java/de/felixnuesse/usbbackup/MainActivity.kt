@@ -1,11 +1,9 @@
 package de.felixnuesse.usbbackup
 
 import android.content.Intent
-import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
-import android.provider.OpenableColumns
-import android.util.Log
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,16 +12,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTaskDao
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
+import de.felixnuesse.usbbackup.dialog.ConfirmDialog
+import de.felixnuesse.usbbackup.dialog.InputDialog
+import de.felixnuesse.usbbackup.dialog.DialogCallbacks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
 
     private lateinit var binding: ActivityMainBinding
+    private lateinit var mDb: AppDatabase
+    private lateinit var mTaskDao: BackupTaskDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,53 +44,72 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AddActivity::class.java))
         }
 
-        lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
-                val db = AppDatabase.Companion.getDatabase(this@MainActivity)
-                binding.taskList.setLayoutManager(LinearLayoutManager(this@MainActivity))
-                val adapter = TaskListAdapter(db.backupDao().getAll(), this@MainActivity)
-                binding.taskList.adapter = adapter
-            }
-        }
+        mDb = AppDatabase.Companion.getDatabase(this@MainActivity)
+        mTaskDao = mDb.backupDao()
+        updateList()
+    }
 
+    override fun onResume() {
+        super.onResume()
+        updateList()
     }
 
 
+    fun updateList() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                val adapter = TaskListAdapter(mTaskDao.getAll(), this@MainActivity, this@MainActivity)
 
-
-    fun metadata(uri: Uri) {
-        val contentResolver = applicationContext.contentResolver
-
-        // The query, because it only applies to a single document, returns only
-        // one row. There's no need to filter, sort, or select fields,
-        // because we want all fields for one document.
-        val cursor: Cursor? = contentResolver.query(uri, null, null, null, null, null)
-
-        cursor?.use {
-            // moveToFirst() returns false if the cursor has 0 rows. Very handy for
-            // "if there's anything to look at, look at it" conditionals.
-            if (it.moveToFirst()) {
-
-                // Note it's called "Display Name". This is
-                // provider-specific, and might not necessarily be the file name.
-                val displayName: String = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                Log.i("TAG", "Display Name: $displayName")
-
-                val sizeIndex: Int = it.getColumnIndex(OpenableColumns.SIZE)
-                // If the size is unknown, the value stored is null. But because an
-                // int can't be null, the behavior is implementation-specific,
-                // and unpredictable. So as
-                // a rule, check if it's null before assigning to an int. This will
-                // happen often: The storage API allows for remote files, whose
-                // size might not be locally known.
-                val size: String = if (!it.isNull(sizeIndex)) {
-                    // Technically the column stores an int, but cursor.getString()
-                    // will do the conversion automatically.
-                    it.getString(sizeIndex)
-                } else {
-                    "Unknown"
+                val handler = Handler(Looper.getMainLooper())
+                handler.post {
+                    binding.taskList.setLayoutManager(LinearLayoutManager(this@MainActivity))
+                    binding.taskList.adapter = adapter
                 }
-                Log.i("TAG", "Size: $size")
+            }
+        }
+    }
+
+    override fun click(task: BackupTask, menuItemId: Int): Boolean {
+        return when(menuItemId) {
+            R.id.taskMenuItemDelete -> {
+                ConfirmDialog(this@MainActivity, this@MainActivity).showDialog(task.id!!, task.name)
+                true
+            }
+            R.id.taskMenuItemSetPassword -> {
+                InputDialog(this@MainActivity, this@MainActivity).showDialog(task.id!!)
+                true
+            }
+            R.id.taskMenuItemDeletePassword -> {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        task.containerPW = null
+                        mTaskDao.update(task)
+                        updateList()
+                    }
+                }
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    override fun setText(text: String, id: Int) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                var task = mTaskDao.get(id)
+                task.containerPW = text
+                mTaskDao.update(task)
+                updateList()
+            }
+        }
+    }
+
+    override fun confirmDelete(id: Int) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                mTaskDao.deleteById(id)
+                updateList()
             }
         }
     }

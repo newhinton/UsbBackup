@@ -10,7 +10,7 @@ data class BackupTask (
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "sourceUri") val sourceUri: String,
     @ColumnInfo(name = "targetUri") val targetUri: String,
-    @ColumnInfo(name = "containerPW") val containerPW: String?,
+    @ColumnInfo(name = "containerPW") var containerPW: String?,
     @ColumnInfo(name = "enabled") val enabled: Boolean
 ) {
     companion object {

@@ -2,20 +2,63 @@ package de.felixnuesse.usbbackup
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
 
-class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context) : RecyclerView.Adapter<TaskListAdapter.Row>() {
+
+class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context, private val mPopupCallback: PopupCallback) : RecyclerView.Adapter<TaskListAdapter.Row>() {
 
     inner class Row(var binding: RecyclerviewTaskBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setTask(task: BackupTask) {
             binding.title.text = task.name
-            binding.source.text = task.sourceUri
-            binding.target.text = task.targetUri
+
+            var sourceUri = task.sourceUri.toUri()
+            var targetUri = task.targetUri.toUri()
+
+            binding.source.text = "${UriUtils.getStorageId(sourceUri)}: ${UriUtils.getName(mContext, sourceUri)}"
+            binding.target.text = UriUtils.getStorageId(targetUri)
+
+            var menu = getPopupMenu(binding.moreButton, task)
+
+            binding.moreButton.setOnClickListener {
+                menu.show()
+            }
+
+
+            if(!task.containerPW.isNullOrBlank()) {
+                binding.layoutNoPassword.visibility = View.GONE
+            } else {
+                menu.menu.findItem(R.id.taskMenuItemDeletePassword).isVisible = false
+            }
+
+
+            if(StorageUtils.get(mContext, task.targetUri.toUri()) == null) {
+                binding.layoutDiskAvailable.visibility = View.GONE
+            }
+
         }
     }
+
+    fun getPopupMenu(anchor: View, task: BackupTask): PopupMenu {
+        val popupMenu = PopupMenu(mContext, anchor)
+        popupMenu.menuInflater.inflate(R.menu.task_menu, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            if(task.id != null) {
+                mPopupCallback.click(task, menuItem.itemId)
+                true
+            } else {
+                false
+            }
+        }
+        return popupMenu
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Row {
         val binding = RecyclerviewTaskBinding.inflate(LayoutInflater.from(parent.context), parent, false)

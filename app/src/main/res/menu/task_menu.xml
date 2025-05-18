@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/taskMenuItemDelete"
+        android:icon="@drawable/round_delete_24"
+        android:title="Delete" />
+    <item
+        android:id="@+id/taskMenuItemDeletePassword"
+        android:icon="@drawable/round_delete_24"
+        android:title="Remove Password" />
+    <item
+        android:id="@+id/taskMenuItemSetPassword"
+        android:icon="@drawable/round_delete_24"
+        android:title="Set Password" />
+</menu>

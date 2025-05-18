@@ -8,7 +8,6 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import de.felixnuesse.usbbackup.R
 
 
 class Notifications(private var context: Context) {
