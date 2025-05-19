@@ -20,9 +20,10 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
             var sourceUri = task.sourceUri.toUri()
             var targetUri = task.targetUri.toUri()
+            var targetUriName = UriUtils.getStorageId(targetUri)
 
             binding.source.text = "${UriUtils.getStorageId(sourceUri)}: ${UriUtils.getName(mContext, sourceUri)}"
-            binding.target.text = UriUtils.getStorageId(targetUri)
+            binding.target.text = targetUriName
 
             var menu = getPopupMenu(binding.moreButton, task)
 
@@ -38,7 +39,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
             }
 
 
-            if(StorageUtils.get(mContext, task.targetUri.toUri()) == null) {
+            if(StorageUtils.get(mContext, task.targetUri.toUri()) == null && targetUriName != "primary") {
                 binding.layoutDiskAvailable.visibility = View.GONE
             }
 

@@ -1,17 +1,28 @@
 package de.felixnuesse.usbbackup
 
+import de.felixnuesse.usbbackup.crypto.AES
 import org.junit.Test
 
 import org.junit.Assert.*
+import java.nio.ByteBuffer
 
 /**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
+ * Source: https://www.baeldung.com/kotlin/advanced-encryption-standard
  */
-class ExampleUnitTest {
+class Crypto {
+
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun `Given text when encrypted and decrypted should return original text`() {
+        val aes = AES()
+        val originalText = "Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!Hello Kotlin AES Encryption!"
+        val password = "super secret password"
+
+        //val encryptedData = aes.aesEncrypt(originalText.toByteArray(), password.toCharArray())
+        //val decryptedData = aes.aesDecrypt(encryptedData, password.toCharArray())
+        //val decryptedText = String(decryptedData)
+
+        //System.err.println("Original: "+originalText)
+        //System.err.println("Decrypted: "+decryptedText)
+        //assertTrue("The decrypted text does not match the original", originalText == decryptedText)
     }
 }

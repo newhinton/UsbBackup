@@ -1,7 +1,7 @@
 package de.felixnuesse.usbbackup.worker
 
 import android.content.Context
-import android.text.format.DateFormat
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import de.felixnuesse.usbbackup.UriUtils
+import de.felixnuesse.usbbackup.crypto.AES
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
 import java.io.File
@@ -91,13 +92,23 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
 
                     var target = DocumentFile.fromTreeUri(mContext, it.targetUri.toUri())
-                    var file = target?.createFile("", getName(it.name))!!
-                    mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                        outputStream.write(unencryptedCacheFile.readBytes())
-                        outputStream.flush()
+                    var file = target?.createFile("", getName(it))!!
+
+
+                    if(!it.containerPW.isNullOrBlank()) {
+                        Log.e("Tag", "Encrypting...")
+                        AES().aesEncrypt(unencryptedCacheFile, mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
+                    } else {
+                        Log.e("Tag", "Storing...")
+                        mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
+                            outputStream.write(unencryptedCacheFile.readBytes())
+                            outputStream.flush()
+                        }
                     }
+
                     unencryptedCacheFile.delete()
 
+                    Log.e("Tag", "Done!")
                     mNotifications.showNotification("Backup Done!", "Task: ${it.name}")
                 } catch (e: Exception) {
                     mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, error: ${e.message}")
@@ -121,7 +132,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String) {
         current.listFiles().forEach {
-            //Log.e("Tag", "Processing: $path${it.name}")
+            Log.e("Tag", "Processing: $path${it.name}")
             if(it.isDirectory) {
                 val entry = ZipEntry("$path${it.name}/")
                 zip.putNextEntry(entry)
@@ -131,19 +142,31 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             if(it.isFile) {
                 val entry = ZipEntry("$path${it.name}")
                 zip.putNextEntry(entry)
-                var stream = mContext.contentResolver.openInputStream(it.uri)
-                var bytes = stream?.readBytes()
-                zip.write(bytes)
-                stream?.close()
+                writeToZip(zip, it.uri)
                 zip.closeEntry()
             }
         }
 
     }
 
-    private fun getName(title: String): String {
+    private fun writeToZip(zip: ZipOutputStream, uri: Uri) {
+        var stream = mContext.contentResolver.openInputStream(uri)
+        val buffer = ByteArray(16384)
+
+        var bytesRead: Int
+        while (stream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
+            zip.write(buffer, 0, bytesRead)
+        }
+        stream?.close()
+    }
+
+
+    private fun getName(task: BackupTask): String {
         val date = Date(System.currentTimeMillis())
         val format = SimpleDateFormat("yyyy-MM-dd-hh-mm")
-        return "${title}_" + format.format(date) + ".zip"
+
+        val prefix = if(!task.containerPW.isNullOrBlank()) "encrypted_"  else ""
+
+        return "$prefix${task.name}_" + format.format(date) + ".zip"
     }
 }
