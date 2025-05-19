@@ -44,7 +44,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         }
     }
 
-    private var mNotifications = Notifications(mContext)
+    private var mNotifications = Notifications(mContext, 0)
 
     override fun doWork(): Result {
 
@@ -75,8 +75,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         tasks.forEach {
             if(it.enabled){
                 // todo: wrap and catch exceptions
-
-                mNotifications.showNotification("Backup in Progress", "Task: ${it.name}")
+                mNotifications = Notifications(mContext, it.id!!.toInt())
+                mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true)
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
 
                 try {
@@ -96,9 +96,15 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
 
                     if(!it.containerPW.isNullOrBlank()) {
+                        mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true)
                         Log.e("Tag", "Encrypting...")
-                        AES().aesEncrypt(unencryptedCacheFile, mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
+                        AES().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
+                        Log.e("Tag", "Decrypting...")
+                        val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
+                        val target = File(mContext.externalCacheDir, "de_"+getName(it)).outputStream()
+                        AES().aesDecrypt(decrypted, target, it.containerPW!!.toCharArray())
                     } else {
+                        mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true)
                         Log.e("Tag", "Storing...")
                         mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
                             outputStream.write(unencryptedCacheFile.readBytes())
@@ -107,23 +113,11 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     }
 
                     unencryptedCacheFile.delete()
-
                     Log.e("Tag", "Done!")
-                    mNotifications.showNotification("Backup Done!", "Task: ${it.name}")
+                    mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
                 } catch (e: Exception) {
                     mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, error: ${e.message}")
                 }
-
-
-                //mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                //    val inputStream = mContext.contentResolver.openInputStream(it.uri)?.use { inputStream ->
-                //        outputStream.write(inputStream.readBytes())
-                //    }
-                //    outputStream.flush()
-                //}
-
-                // todo
-
             }
         }
 
@@ -132,7 +126,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String) {
         current.listFiles().forEach {
-            Log.e("Tag", "Processing: $path${it.name}")
+            //Log.e("Tag", "Processing: $path${it.name}")
             if(it.isDirectory) {
                 val entry = ZipEntry("$path${it.name}/")
                 zip.putNextEntry(entry)
@@ -163,7 +157,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     private fun getName(task: BackupTask): String {
         val date = Date(System.currentTimeMillis())
-        val format = SimpleDateFormat("yyyy-MM-dd-hh-mm")
+        val format = SimpleDateFormat("yyyy-MM-dd-HH-mm")
 
         val prefix = if(!task.containerPW.isNullOrBlank()) "encrypted_"  else ""
 

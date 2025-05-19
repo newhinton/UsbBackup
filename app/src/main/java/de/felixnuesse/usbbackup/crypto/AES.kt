@@ -1,6 +1,7 @@
 package de.felixnuesse.usbbackup.crypto
 
-import java.io.File
+import android.util.Log
+import java.io.InputStream
 import java.io.OutputStream
 import java.security.SecureRandom
 import javax.crypto.Cipher
@@ -20,11 +21,25 @@ class AES {
         private var KEY_ITERATIONS = 50000
         private var KEY_SZE = 256
 
+        private var BUFFER_SIZE = 16384 //16k
+
         private fun getSalt(): ByteArray {
             val salt = ByteArray(100)
             val random = SecureRandom()
             random.nextBytes(salt)
             return salt
+        }
+
+
+        private fun getIV(): ByteArray {
+            val salt = ByteArray(16)
+            val random = SecureRandom()
+            random.nextBytes(salt)
+            return salt
+        }
+
+        private fun getCipher(): Cipher {
+            return Cipher.getInstance("AES/CBC/PKCS5Padding")
         }
     }
 
@@ -35,26 +50,47 @@ class AES {
         return SecretKeySpec(pbeKey.encoded, "AES")
     }
 
-    fun aesEncrypt(data: File, targetFile: OutputStream, password: CharArray) {
+    fun aesEncrypt(data: InputStream, targetFile: OutputStream, password: CharArray) {
+
+        val cipher = getCipher()
+
         val salt = getSalt()
+        var iv = getIV()
+
         val secretKey = getSecretKeyFromPW(password, salt)
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
 
 
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-
-        // Use a secure IV in production
-        val ivParameterSpec = IvParameterSpec(ByteArray(16))
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec)
-
-
-
-        // make the first 100 bytes the salt
+        // make the first 100 bytes the salt, and the next 16 the iv
         targetFile.write(salt)
+        targetFile.write(iv)
 
-        val buffer = ByteArray(16384) // 16KB buffer
-        var fileStream = data.inputStream()
-        while (fileStream.available() != 0) {
-            fileStream.read(buffer)
+        val buffer = ByteArray(BUFFER_SIZE)
+        while (data.available() != 0) {
+            data.read(buffer)
+            targetFile.write(cipher.update(buffer))
+        }
+
+        targetFile.write(cipher.doFinal())
+    }
+
+
+    fun aesDecrypt(data: InputStream, targetFile: OutputStream, password: CharArray) {
+
+        val cipher = getCipher()
+
+        var salt = ByteArray(100)
+        var iv = ByteArray(16)
+        data.read(salt) // read consumes
+        data.read(iv)
+
+        val secretKey = getSecretKeyFromPW(password, salt)
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
+
+
+        val buffer = ByteArray(BUFFER_SIZE)
+        while (data.available() != 0) {
+            data.read(buffer)
             targetFile.write(cipher.update(buffer))
         }
 

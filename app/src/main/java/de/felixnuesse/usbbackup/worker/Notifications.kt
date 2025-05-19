@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import de.felixnuesse.usbbackup.R
 
 
-class Notifications(private var context: Context) {
+class Notifications(private var context: Context, private var mId: Int) {
 
 
     val mNotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -22,7 +22,7 @@ class Notifications(private var context: Context) {
     }
 
 
-    fun showNotification(title: String, message: String) {
+    fun showNotification(title: String, message: String, ongoing: Boolean = false, progress: Int = 0) {
 
         NotificationManagerCompat.from(context).areNotificationsEnabled()
 
@@ -35,9 +35,13 @@ class Notifications(private var context: Context) {
             .setSmallIcon(R.drawable.security_key_24px)
             .setContentTitle(title)
             .setContentText(message)
-            .setAutoCancel(true)
 
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build())
+        if(ongoing) {
+            mBuilder.setProgress(100, progress, true)
+            mBuilder.setOngoing(true)
+        }
+
+        mNotificationManager.notify(NOTIFICATION_ID+mId, mBuilder.build())
     }
 
 
