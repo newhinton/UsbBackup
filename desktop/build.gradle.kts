@@ -9,13 +9,15 @@ java {
     java.sourceSets["main"].java {
         srcDir("..app/src/main/java/")
     }
-
 }
+
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
     }
 }
+
 
 dependencies {
     implementation(libs.clikt)
@@ -32,6 +34,9 @@ tasks.jar {
         .map(::zipTree)
     from(dependencies)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    archiveBaseName.set("aes-tool")
+    archiveVersion.set("1.0.0")
 }
 
 tasks.register<JavaExec>("execute") {
