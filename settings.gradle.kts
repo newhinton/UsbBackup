@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "UsbBackup"
 include(":app")
- 
+include(":desktop")
+include(":crypto")

@@ -10,6 +10,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import de.felixnuesse.crypto.Crypto
 import de.felixnuesse.usbbackup.UriUtils
 import de.felixnuesse.usbbackup.crypto.AES
 import de.felixnuesse.usbbackup.database.AppDatabase
@@ -98,11 +99,11 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     if(!it.containerPW.isNullOrBlank()) {
                         mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true)
                         Log.e("Tag", "Encrypting...")
-                        AES().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
+                        Crypto().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
                         Log.e("Tag", "Decrypting...")
                         val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
                         val target = File(mContext.externalCacheDir, "de_"+getName(it))
-                        AES().aesDecrypt(decrypted, target.outputStream(), it.containerPW!!.toCharArray())
+                        Crypto().aesDecrypt(decrypted, target.outputStream(), it.containerPW!!.toCharArray())
                     } else {
                         mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true)
                         Log.e("Tag", "Storing...")

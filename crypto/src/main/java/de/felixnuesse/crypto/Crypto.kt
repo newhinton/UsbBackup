@@ -1,4 +1,4 @@
-package de.felixnuesse.usbbackup.crypto
+package de.felixnuesse.crypto
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -10,11 +10,10 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.PBEKeySpec
 import javax.crypto.spec.SecretKeySpec
 
-
 /**
  * Source: https://www.baeldung.com/kotlin/advanced-encryption-standard
  */
-class AES {
+class Crypto {
 
     companion object {
         private var KEY_ITERATIONS = 50000
