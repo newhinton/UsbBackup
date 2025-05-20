@@ -101,8 +101,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                         AES().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
                         Log.e("Tag", "Decrypting...")
                         val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
-                        val target = File(mContext.externalCacheDir, "de_"+getName(it)).outputStream()
-                        AES().aesDecrypt(decrypted, target, it.containerPW!!.toCharArray())
+                        val target = File(mContext.externalCacheDir, "de_"+getName(it))
+                        AES().aesDecrypt(decrypted, target.outputStream(), it.containerPW!!.toCharArray())
                     } else {
                         mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true)
                         Log.e("Tag", "Storing...")
@@ -116,6 +116,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     Log.e("Tag", "Done!")
                     mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
                 } catch (e: Exception) {
+                    Log.e("Tag", "Error: ${e.message}}")
+                    e.printStackTrace()
                     mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, error: ${e.message}")
                 }
             }

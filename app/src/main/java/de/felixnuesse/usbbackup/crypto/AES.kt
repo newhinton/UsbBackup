@@ -1,6 +1,5 @@
 package de.felixnuesse.usbbackup.crypto
 
-import android.util.Log
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.SecureRandom
@@ -24,7 +23,7 @@ class AES {
         private var BUFFER_SIZE = 16384 //16k
 
         private fun getSalt(): ByteArray {
-            val salt = ByteArray(100)
+            val salt = ByteArray(128)
             val random = SecureRandom()
             random.nextBytes(salt)
             return salt
@@ -55,7 +54,7 @@ class AES {
         val cipher = getCipher()
 
         val salt = getSalt()
-        var iv = getIV()
+        val iv = getIV()
 
         val secretKey = getSecretKeyFromPW(password, salt)
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, IvParameterSpec(iv))
@@ -65,13 +64,7 @@ class AES {
         targetFile.write(salt)
         targetFile.write(iv)
 
-        val buffer = ByteArray(BUFFER_SIZE)
-        while (data.available() != 0) {
-            data.read(buffer)
-            targetFile.write(cipher.update(buffer))
-        }
-
-        targetFile.write(cipher.doFinal())
+        processData(cipher, data, targetFile)
     }
 
 
@@ -79,21 +72,32 @@ class AES {
 
         val cipher = getCipher()
 
-        var salt = ByteArray(100)
-        var iv = ByteArray(16)
+        val salt = ByteArray(128)
+        val iv = ByteArray(16)
         data.read(salt) // read consumes
         data.read(iv)
 
         val secretKey = getSecretKeyFromPW(password, salt)
         cipher.init(Cipher.DECRYPT_MODE, secretKey, IvParameterSpec(iv))
 
+        processData(cipher, data, targetFile)
+    }
 
-        val buffer = ByteArray(BUFFER_SIZE)
+
+    private fun processData(cipher: Cipher, data: InputStream, targetFile: OutputStream) {
+
+        var buffer = ByteArray(BUFFER_SIZE)
         while (data.available() != 0) {
+            if(data.available() < BUFFER_SIZE) {
+                buffer = ByteArray(data.available())
+            }
             data.read(buffer)
             targetFile.write(cipher.update(buffer))
         }
 
         targetFile.write(cipher.doFinal())
+
+        targetFile.close()
+        data.close()
     }
 }

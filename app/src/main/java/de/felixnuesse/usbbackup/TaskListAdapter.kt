@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import de.felixnuesse.usbbackup.database.BackupTask
@@ -45,6 +46,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
             binding.startBackup.setOnClickListener {
                 BackupWorker.now(mContext, task.id!!)
+                Toast.makeText(mContext, "Start Task: ${task.name}", Toast.LENGTH_SHORT).show()
             }
 
         }
