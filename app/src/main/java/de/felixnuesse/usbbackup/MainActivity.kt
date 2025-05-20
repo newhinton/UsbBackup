@@ -98,6 +98,26 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
                 }
                 true
             }
+            R.id.taskMenuItemEnable -> {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        task.enabled = true
+                        mTaskDao.update(task)
+                        updateList()
+                    }
+                }
+                true
+            }
+            R.id.taskMenuItemDisable -> {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        task.enabled = false
+                        mTaskDao.update(task)
+                        updateList()
+                    }
+                }
+                true
+            }
 
             else -> false
         }

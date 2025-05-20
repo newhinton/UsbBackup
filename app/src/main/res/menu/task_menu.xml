@@ -13,4 +13,10 @@
         android:id="@+id/taskMenuItemSetPassword"
         android:icon="@drawable/round_delete_24"
         android:title="Set Password" />
+    <item
+        android:id="@+id/taskMenuItemDisable"
+        android:title="Disable" />
+    <item
+        android:id="@+id/taskMenuItemEnable"
+        android:title="Enable" />
 </menu>

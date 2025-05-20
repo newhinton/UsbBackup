@@ -1,6 +1,7 @@
 package de.felixnuesse.usbbackup
 
 import android.content.Context
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,10 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
     inner class Row(var binding: RecyclerviewTaskBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setTask(task: BackupTask) {
             binding.title.text = task.name
+
+            if(!task.enabled) {
+                binding.title.paintFlags = binding.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            }
 
             var sourceUri = task.sourceUri.toUri()
             var targetUri = task.targetUri.toUri()
@@ -37,6 +42,15 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 binding.layoutNoPassword.visibility = View.GONE
             } else {
                 menu.menu.findItem(R.id.taskMenuItemDeletePassword).isVisible = false
+            }
+
+
+            if(task.enabled) {
+                menu.menu.findItem(R.id.taskMenuItemDisable).isVisible = true
+                menu.menu.findItem(R.id.taskMenuItemEnable).isVisible = false
+            } else {
+                menu.menu.findItem(R.id.taskMenuItemDisable).isVisible = false
+                menu.menu.findItem(R.id.taskMenuItemEnable).isVisible = true
             }
 
 

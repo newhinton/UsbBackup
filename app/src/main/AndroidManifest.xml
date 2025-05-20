@@ -32,9 +32,13 @@
             android:exported="true">
         </activity>
 
+        <receiver
+            android:name=".receiver.NotificationReceiver"
+            android:exported="true">
+        </receiver>
 
         <receiver
-            android:name=".MediaBroadcastReceiver"
+            android:name=".receiver.MediaBroadcastReceiver"
             android:exported="true">
             <intent-filter>
 

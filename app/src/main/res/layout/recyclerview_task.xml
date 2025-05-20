@@ -148,6 +148,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:minWidth="0dp"
+                    app:iconTint="@null"
                     app:icon="@drawable/round_backup_24"
                     app:iconPadding="0dp"
                     app:layout_constraintEnd_toEndOf="parent"

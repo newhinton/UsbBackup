@@ -16,12 +16,11 @@ import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
 import java.io.File
 import java.io.FileOutputStream
-import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-
 
 class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams) {
 
@@ -42,6 +41,11 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             val request = OneTimeWorkRequestBuilder<BackupWorker>()
             request.setInputData(data.build())
             WorkManager.getInstance(context).enqueue(request.build())
+        }
+
+        fun stop(context: Context, uuid: UUID) {
+            Log.e("TAG", "Stop Work: $uuid")
+            WorkManager.getInstance(context).cancelWorkById(uuid)
         }
     }
 
@@ -77,6 +81,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             if(it.enabled){
                 // todo: wrap and catch exceptions
                 mNotifications = Notifications(mContext, it.id!!.toInt())
+                mNotifications.mUuid = this.id
+
                 mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true)
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
 
@@ -91,21 +97,40 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                         }
                     }
 
+                    if(this.isStopped) {
+                        unencryptedCacheFile.delete()
+                        mNotifications.dismiss()
+                        return Result.success()
+                    }
 
-                    var target = DocumentFile.fromTreeUri(mContext, it.targetUri.toUri())
-                    var file = target?.createFile("", getName(it))!!
-
+                    var targetFolder = DocumentFile.fromTreeUri(mContext, it.targetUri.toUri())
+                    var file = targetFolder?.createFile("", getName(it))!!
 
                     if(!it.containerPW.isNullOrBlank()) {
-                        mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true)
+                        mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true, false)
                         Log.e("Tag", "Encrypting...")
                         Crypto().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
+
                         Log.e("Tag", "Decrypting...")
                         val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
                         val target = File(mContext.externalCacheDir, "de_"+getName(it))
                         Crypto().aesDecrypt(decrypted, target.outputStream(), it.containerPW!!.toCharArray())
+
+                        Log.e("Tag", "Update decrypt-tool...")
+                        var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
+                        decryptToolPath?.let { fileName ->
+                            var targetTool = targetFolder.findFile(fileName)
+                            if(targetTool==null) {
+                                mNotifications.showNotification("Backing up ${it.name}...", "Updating tool...", true)
+                                var decryptTool = targetFolder.createFile("", fileName)!!
+                                mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
+                                    outputStream.write(mContext.assets.open(fileName).readAllBytes())
+                                    outputStream.flush()
+                                }
+                            }
+                        }
                     } else {
-                        mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true)
+                        mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true, false)
                         Log.e("Tag", "Storing...")
                         mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
                             outputStream.write(unencryptedCacheFile.readBytes())
@@ -114,23 +139,6 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     }
 
                     unencryptedCacheFile.delete()
-
-
-                    Log.e("Tag", "Update decrypt-tool...")
-                    var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
-                    decryptToolPath?.let { fileName ->
-                        var targetTool = target.findFile(fileName)
-                        if(targetTool==null) {
-                            mNotifications.showNotification("Backing up ${it.name}...", "Updating tool...", true)
-                            var decryptTool = target.createFile("", fileName)!!
-                            mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
-                                outputStream.write(mContext.assets.open(fileName).readAllBytes())
-                                outputStream.flush()
-                            }
-                        }
-                    }
-
-
                     Log.e("Tag", "Done!")
                     mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
                 } catch (e: Exception) {
@@ -144,7 +152,14 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         return Result.success()
     }
 
+
+    override fun onStopped() {
+        super.onStopped()
+        Log.e("Tag", "Was stopped! ${this.id}")
+    }
+
     private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String) {
+        if(this.isStopped) return
         current.listFiles().forEach {
             //Log.e("Tag", "Processing: $path${it.name}")
             if(it.isDirectory) {

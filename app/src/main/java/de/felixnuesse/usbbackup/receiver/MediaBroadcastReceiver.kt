@@ -1,4 +1,4 @@
-package de.felixnuesse.usbbackup
+package de.felixnuesse.usbbackup.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,15 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.storage.StorageManager
 import android.util.Log
-import androidx.lifecycle.lifecycleScope
-import de.felixnuesse.usbbackup.AddActivity
-import de.felixnuesse.usbbackup.database.AppDatabase
-import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.worker.BackupWorker
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 class MediaBroadcastReceiver: BroadcastReceiver() {
 
@@ -44,7 +36,7 @@ class MediaBroadcastReceiver: BroadcastReceiver() {
             Handler(Looper.getMainLooper()).postDelayed({
                 // this requires timing, and a lot of assumptions. MEDIA_MOUNT would truly be better
                 var newDrive = sm.storageVolumes.filter { it !in preMountVolumes }.toList().first()
-                BackupWorker.now(context, newDrive.uuid.toString())
+                BackupWorker.Companion.now(context, newDrive.uuid.toString())
             }, 5000)
 
 
