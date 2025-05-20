@@ -60,3 +60,16 @@ dependencies {
 
     implementation(project(":crypto"))
 }
+
+tasks.register<Copy>("deployDesktop") {
+    dependsOn(":desktop:jar")
+    println("${rootDir}/desktop/build/libs/aes-tool-1.0.0.jar")
+    from("${rootDir}/desktop/build/libs/aes-tool-1.0.0.jar")
+    into("${rootDir}/app/src/main/assets/")
+    include("*.jar")
+}
+
+
+tasks.preBuild {
+    dependsOn("deployDesktop")
+}

@@ -27,6 +27,7 @@ dependencies {
 
 
 tasks.jar {
+    dependsOn(":crypto:jar")
     manifest.attributes["Main-Class"] = "de.felixnuesse.desktop.MainKt"
     val dependencies = configurations
         .runtimeClasspath

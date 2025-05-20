@@ -12,11 +12,11 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import de.felixnuesse.crypto.Crypto
 import de.felixnuesse.usbbackup.UriUtils
-import de.felixnuesse.usbbackup.crypto.AES
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.zip.ZipEntry
@@ -114,6 +114,23 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     }
 
                     unencryptedCacheFile.delete()
+
+
+                    Log.e("Tag", "Update decrypt-tool...")
+                    var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
+                    decryptToolPath?.let { fileName ->
+                        var targetTool = target.findFile(fileName)
+                        if(targetTool==null) {
+                            mNotifications.showNotification("Backing up ${it.name}...", "Updating tool...", true)
+                            var decryptTool = target.createFile("", fileName)!!
+                            mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
+                                outputStream.write(mContext.assets.open(fileName).readAllBytes())
+                                outputStream.flush()
+                            }
+                        }
+                    }
+
+
                     Log.e("Tag", "Done!")
                     mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
                 } catch (e: Exception) {
