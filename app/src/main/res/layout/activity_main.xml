@@ -24,8 +24,6 @@
         android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:backgroundTint="@color/primary"
-        app:tint="?iconTint"
         app:srcCompat="@drawable/round_add_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

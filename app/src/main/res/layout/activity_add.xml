@@ -75,7 +75,6 @@
                 android:minWidth="0dp"
                 app:icon="@drawable/round_insert_drive_file_24"
                 app:iconPadding="0dp"
-                app:iconTint="?iconTint"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
                 app:layout_constraintTop_toTopOf="@+id/sourceUri" />
 
@@ -88,7 +87,6 @@
                 android:minWidth="0dp"
                 app:icon="@drawable/round_folder_24"
                 app:iconPadding="0dp"
-                app:iconTint="?iconTint"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
 
@@ -97,8 +95,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:iconTint="@color/primary"
-                app:tint="@color/primary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUriMetadata"
@@ -133,7 +129,6 @@
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/round_folder_24"
-                app:iconTint="?iconTint"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/targetUri" />
@@ -149,10 +144,8 @@
         android:clickable="false"
         android:enabled="true"
         android:visibility="invisible"
-        app:backgroundTint="@color/primary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/round_save_24"
-        app:tint="?iconTint" />
+        app:srcCompat="@drawable/round_save_24"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
