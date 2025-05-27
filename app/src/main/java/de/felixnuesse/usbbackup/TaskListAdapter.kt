@@ -39,7 +39,8 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
 
             if(!task.containerPW.isNullOrBlank()) {
-                binding.layoutNoPassword.visibility = View.GONE
+                binding.noPasswordTextView.visibility = View.GONE
+                binding.noPasswordImageView.visibility = View.INVISIBLE
             } else {
                 menu.menu.findItem(R.id.taskMenuItemDeletePassword).isVisible = false
             }

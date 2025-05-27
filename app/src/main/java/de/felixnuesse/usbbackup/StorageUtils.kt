@@ -23,6 +23,11 @@ class StorageUtils {
             var sm = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
             return sm.primaryStorageVolume.createOpenDocumentTreeIntent()
         }
+
+        fun state(context: Context, uri: Uri): String? {
+            var sm = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+            return sm.getStorageVolume(uri).state
+        }
     }
 
 

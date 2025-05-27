@@ -29,24 +29,36 @@
             android:layout_height="wrap_content"
             android:layout_margin="12dp">
 
+
+            <ImageView
+                android:id="@+id/noPasswordImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/round_lock_open_24"
+                app:tint="#D00000" />
+
+
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                app:layout_constraintBottom_toBottomOf="@+id/noPasswordImageView"
                 app:layout_constraintEnd_toStartOf="@+id/moreButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@+id/noPasswordImageView"
+                app:layout_constraintTop_toTopOf="@+id/noPasswordImageView" />
 
             <TextView
                 android:id="@+id/labelSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="Source:"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title" />
+                app:layout_constraintTop_toBottomOf="@+id/noPasswordImageView" />
 
             <TextView
                 android:id="@+id/source"
@@ -89,33 +101,19 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/round_more_vert_24" />
 
-            <LinearLayout
-                android:id="@+id/layoutNoPassword"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/noPasswordTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:padding="24dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical"
+                android:text="Warning! No password set. Backup will be unencrypted!"
+                android:textColor="#D00000"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/target">
-
-                <ImageView
-                    android:id="@+id/imageView3"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    app:srcCompat="@drawable/round_lock_open_24"
-                    app:tint="#D00000" />
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:text="Warning! No password set. Backup will be unencrypted!"
-                    android:textColor="#D00000" />
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@+id/target" />
 
             <LinearLayout
                 android:id="@+id/layoutDiskAvailable"
@@ -124,7 +122,7 @@
                 android:orientation="horizontal"
                 android:padding="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layoutNoPassword">
+                app:layout_constraintTop_toBottomOf="@+id/noPasswordTextView">
 
                 <ImageView
                     android:id="@+id/imageView2"

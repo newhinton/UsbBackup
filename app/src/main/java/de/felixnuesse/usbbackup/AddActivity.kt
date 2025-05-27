@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.provider.DocumentsContract
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
@@ -30,9 +30,11 @@ class AddActivity : AppCompatActivity() {
     companion object {
         private const val SOURCE_REQUEST_ID = 423
         private const val TARGET_REQUEST_ID = 424
+        private const val SOURCE_LAST_URI = "SOURCE_LAST_URI"
     }
 
     private lateinit var binding: ActivityAddBinding
+    private lateinit var mPrefs: Prefs
 
     private var mSourceUri: Uri? = null
     private var mTargetUri: Uri? = null
@@ -49,11 +51,14 @@ class AddActivity : AppCompatActivity() {
             insets
         }
 
-        binding.sourceUriFolderButton.setOnClickListener { pick(SOURCE_REQUEST_ID) }
+        mPrefs = Prefs(this)
+
+        binding.sourceUriFolderButton.setOnClickListener { pick(SOURCE_REQUEST_ID, mPrefs.getString(SOURCE_LAST_URI, null)) }
         binding.targetUriFolderButton.setOnClickListener { pick(TARGET_REQUEST_ID) }
         binding.sourceUriFileButton.setOnClickListener { openDoc(SOURCE_REQUEST_ID) }
 
         binding.nameTextfield.addTextChangedListener(getUpdateableTextWatcher())
+        binding.pwTextfield.addTextChangedListener(getUpdateableTextWatcher())
 
 
         binding.saveFab.setOnClickListener {
@@ -64,6 +69,11 @@ class AddActivity : AppCompatActivity() {
                 withContext(Dispatchers.IO) {
                     val db = AppDatabase.Companion.getDatabase(this@AddActivity)
                     var backup = BackupTask.new(binding.nameTextfield.text.toString(), mSourceUri.toString(), mTargetUri.toString())
+
+                    if (binding.pwTextfield.text.toString().isNotBlank()) {
+                        backup.containerPW = binding.pwTextfield.text.toString()
+                    }
+
                     db.backupDao().insert(backup)
                 }
             }
@@ -72,8 +82,13 @@ class AddActivity : AppCompatActivity() {
 
     }
 
-    private fun pick(id: Int) {
-        startActivityForResult(StorageUtils.getInitialTreeIntent(this), id)
+    private fun pick(id: Int, initialUriString: String? = null) {
+        var startIntent = StorageUtils.getInitialTreeIntent(this)
+        if(initialUriString != null) {
+            startIntent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+            startIntent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUriString.toUri())
+        }
+        startActivityForResult(startIntent, id)
     }
 
     private fun openDoc(id: Int) {
@@ -99,6 +114,12 @@ class AddActivity : AppCompatActivity() {
             binding.targetUri.text = mTargetUri.toString()
             setUriMetadata(binding.targetUriMetadata, mTargetUri)
         }
+
+        binding.layoutNoPassword.visibility = if (binding.pwTextfield.text.toString().isBlank()) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 
     private fun setUriMetadata(view: TextView, uri: Uri?) {
@@ -119,8 +140,14 @@ class AddActivity : AppCompatActivity() {
 
         if(resultCode == RESULT_OK) {
             when(requestCode) {
-                SOURCE_REQUEST_ID -> resultData?.data?.also { uri -> mSourceUri = uri }
-                TARGET_REQUEST_ID -> resultData?.data?.also { uri -> mTargetUri = uri }
+                SOURCE_REQUEST_ID -> resultData?.data?.also {
+                    uri -> mSourceUri = uri
+                    mPrefs.setString("SOURCE_LAST_URI", mSourceUri.toString())
+                }
+                TARGET_REQUEST_ID -> resultData?.data?.also {
+                    uri -> mTargetUri = uri
+                    mPrefs.setString("TARGET_LAST_URI", mTargetUri.toString())
+                }
             }
             updateUi()
         }
