@@ -69,7 +69,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
     fun getPopupMenu(anchor: View, task: BackupTask): PopupMenu {
         val popupMenu = PopupMenu(mContext, anchor)
-        popupMenu.menuInflater.inflate(R.menu.task_menu, popupMenu.menu)
+        popupMenu.menuInflater.inflate(R.menu.menu_task, popupMenu.menu)
 
         popupMenu.setOnMenuItemClickListener { menuItem ->
             if(task.id != null) {

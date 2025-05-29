@@ -3,15 +3,15 @@
 
     <item
         android:id="@+id/taskMenuItemDelete"
-        android:icon="@drawable/round_delete_24"
+        android:icon="@drawable/icon_delete"
         android:title="Delete" />
     <item
         android:id="@+id/taskMenuItemDeletePassword"
-        android:icon="@drawable/round_delete_24"
+        android:icon="@drawable/icon_delete"
         android:title="Remove Password" />
     <item
         android:id="@+id/taskMenuItemSetPassword"
-        android:icon="@drawable/round_delete_24"
+        android:icon="@drawable/icon_delete"
         android:title="Set Password" />
     <item
         android:id="@+id/taskMenuItemDisable"

@@ -15,4 +15,12 @@ class Prefs(mContext: Context) {
     fun getString(key: String, defaultValue: String?): String? {
         return prefs.getString(key, defaultValue)
     }
+
+    fun showIntro(version: String): Boolean {
+        return prefs.getBoolean("show_intro_version_$version", false)
+    }
+
+    fun finishIntro(version: String) {
+        return prefs.edit { putBoolean("show_intro_version_$version", true)}
+    }
 }

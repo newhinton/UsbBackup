@@ -28,6 +28,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -73,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
-                app:icon="@drawable/round_insert_drive_file_24"
+                app:icon="@drawable/icon_insert_drive_file"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
                 app:layout_constraintTop_toTopOf="@+id/sourceUri"
@@ -86,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
-                app:icon="@drawable/round_folder_24"
+                app:icon="@drawable/icon_folder"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
@@ -96,12 +97,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:iconTint="@color/primary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUriMetadata"
-                app:srcCompat="@drawable/round_arrow_downward_24"
-                app:tint="@color/primary" />
+                app:srcCompat="@drawable/icon_arrow_downward" />
 
             <TextView
                 android:id="@+id/targetUri"
@@ -131,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
-                app:icon="@drawable/round_folder_24"
+                app:icon="@drawable/icon_folder"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/targetUri" />
@@ -145,11 +144,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2">
+        app:layout_constraintTop_toBottomOf="@+id/cardView3">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/pwTextfield"
@@ -174,7 +173,7 @@
             android:id="@+id/imageView3"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            app:srcCompat="@drawable/round_lock_open_24"
+            app:srcCompat="@drawable/icon_lock_open"
             app:tint="#D00000" />
 
         <TextView
@@ -193,13 +192,13 @@
         android:id="@+id/saveFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:clickable="false"
         android:enabled="true"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/round_save_24"/>
+        app:layout_constraintTop_toBottomOf="@+id/layoutNoPassword"
+        app:srcCompat="@drawable/icon_save" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

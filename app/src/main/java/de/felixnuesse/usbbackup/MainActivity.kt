@@ -1,5 +1,6 @@
 package de.felixnuesse.usbbackup
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     private lateinit var binding: ActivityMainBinding
     private lateinit var mDb: AppDatabase
     private lateinit var mTaskDao: BackupTaskDao
+    private lateinit var mPreferences: Prefs
 
 
     private val pushNotificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
@@ -38,6 +40,15 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        mPreferences = Prefs(this)
+        if (!mPreferences.showIntro("0.0.0")) {
+            startActivity(Intent(this, IntroActivity::class.java))
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.main)
@@ -51,6 +62,10 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
         binding.addFab.setOnClickListener {
             startActivity(Intent(this, AddActivity::class.java))
+        }
+
+        binding.aboutButton.setOnClickListener {
+            startActivity(Intent(this, AboutActivity::class.java))
         }
 
         mDb = AppDatabase.Companion.getDatabase(this@MainActivity)

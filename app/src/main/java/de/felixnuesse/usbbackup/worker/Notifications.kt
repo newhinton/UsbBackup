@@ -39,7 +39,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.security_key_24px)
+            .setSmallIcon(R.drawable.icon_security_key)
             .setContentTitle(title)
             .setContentText(message)
 
@@ -48,9 +48,9 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             mBuilder.setOngoing(true)
 
             if(cancellable) {
-                mBuilder.addAction(R.drawable.round_cancel_24, "Cancel", getStopIntent())
+                mBuilder.addAction(R.drawable.icon_cancel, "Cancel", getStopIntent())
             } else {
-                mBuilder.addAction(R.drawable.round_cancel_24, "Cancel", null)
+                mBuilder.addAction(R.drawable.icon_cancel, "Cancel", null)
             }
         }
         mNotificationManager.notify(NOTIFICATION_ID+mId, mBuilder.build())
