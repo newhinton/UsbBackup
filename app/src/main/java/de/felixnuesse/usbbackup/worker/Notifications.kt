@@ -29,7 +29,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
     var mUuid: UUID? = null
 
-    fun showNotification(title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true) {
+    fun showNotification(title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
 
@@ -44,7 +44,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             .setContentText(message)
 
         if(ongoing) {
-            mBuilder.setProgress(100, 0, true)
+            mBuilder.setProgress(100, progress, progress == -1)
             mBuilder.setOngoing(true)
 
             if(cancellable) {

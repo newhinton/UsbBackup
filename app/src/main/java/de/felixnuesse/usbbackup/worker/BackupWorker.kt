@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import de.felixnuesse.crypto.Crypto
+import de.felixnuesse.usbbackup.StorageUtils
 import de.felixnuesse.usbbackup.UriUtils
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
@@ -23,6 +24,19 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams) {
+
+
+    inner class Progress() {
+        var overallSize = 0L
+        var calculatedSize = 0L
+
+        fun getProgress(): Int {
+            val progress = (100L * calculatedSize) / overallSize
+            Log.e("Tag", "progress: ${progress.toInt()} $calculatedSize $overallSize")
+            return progress.toInt()
+        }
+    }
+
 
     companion object {
         fun now(context: Context, storageId: String) {
@@ -88,12 +102,20 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
                 try {
                     val sourceUri = it.sourceUri.toUri()
+
+
+                    val progress = Progress()
+                    progress.overallSize = calculateSize(DocumentFile.fromTreeUri(mContext, sourceUri)!!)
+
+
                     var unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
                     ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use { out ->
                         if(UriUtils.isFolder(mContext, sourceUri)) {
                             val folder = DocumentFile.fromTreeUri(mContext, sourceUri)
-                            addToZipRecursive(folder!!, out, "")
+                            addToZipRecursive(folder!!, out, "", progress)
                             out.close()
+                        } else {
+                            //todo: files????
                         }
                     }
 
@@ -104,7 +126,13 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     }
 
                     var targetFolder = DocumentFile.fromTreeUri(mContext, it.targetUri.toUri())
-                    var file = targetFolder?.createFile("", getName(it))!!
+
+                    var file = try {
+                        targetFolder?.createFile("", getName(it))!!
+                    } catch (e: Exception) {
+                        mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, could not write to storage: ${StorageUtils.state(mContext, it.targetUri.toUri())}")
+                        return@forEach
+                    }
 
                     if(!it.containerPW.isNullOrBlank()) {
                         mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true, false)
@@ -142,7 +170,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     Log.e("Tag", "Done!")
                     mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
                 } catch (e: Exception) {
-                    Log.e("Tag", "Error: ${e.message}}")
+                    Log.e("Tag", "Error: ${e.message}")
                     e.printStackTrace()
                     mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, error: ${e.message}")
                 }
@@ -158,24 +186,26 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         Log.e("Tag", "Was stopped! ${this.id}")
     }
 
-    private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String) {
+    private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String, progress: Progress) {
         if(this.isStopped) return
         current.listFiles().forEach {
+            mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true, false, progress.getProgress())
             //Log.e("Tag", "Processing: $path${it.name}")
             if(it.isDirectory) {
                 val entry = ZipEntry("$path${it.name}/")
                 zip.putNextEntry(entry)
                 zip.closeEntry()
-                addToZipRecursive(it, zip, "$path${it.name}/")
+                // overall size is wrong here. That "resets" the percentage. ideally, we use a "global" variable for both overallSize and calculated size.
+                addToZipRecursive(it, zip, "$path${it.name}/", progress)
             }
             if(it.isFile) {
+                progress.calculatedSize += it.length()
                 val entry = ZipEntry("$path${it.name}")
                 zip.putNextEntry(entry)
                 writeToZip(zip, it.uri)
                 zip.closeEntry()
             }
         }
-
     }
 
     private fun writeToZip(zip: ZipOutputStream, uri: Uri) {
@@ -197,5 +227,17 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         val prefix = if(!task.containerPW.isNullOrBlank()) "encrypted_"  else ""
 
         return "$prefix${task.name}_" + format.format(date) + ".zip"
+    }
+
+    fun calculateSize(root: DocumentFile): Long {
+        var folderSize = 0L
+        if (root.isDirectory) {
+            root.listFiles().forEach {
+                folderSize += calculateSize(it)
+            }
+        } else {
+            folderSize += root.length()
+        }
+        return folderSize
     }
 }
