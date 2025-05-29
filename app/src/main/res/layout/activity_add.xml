@@ -76,7 +76,8 @@
                 app:icon="@drawable/round_insert_drive_file_24"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
-                app:layout_constraintTop_toTopOf="@+id/sourceUri" />
+                app:layout_constraintTop_toTopOf="@+id/sourceUri"
+                tools:visibility="gone" />
 
 
             <com.google.android.material.button.MaterialButton
