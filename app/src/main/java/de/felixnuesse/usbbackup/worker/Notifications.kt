@@ -30,6 +30,10 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     var mUuid: UUID? = null
 
     fun showNotification(title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
+        showNotification(mId, title, message, ongoing, cancellable, progress)
+    }
+
+    fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
 
@@ -53,7 +57,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
                 mBuilder.addAction(R.drawable.icon_cancel, "Cancel", null)
             }
         }
-        mNotificationManager.notify(NOTIFICATION_ID+mId, mBuilder.build())
+        mNotificationManager.notify(NOTIFICATION_ID+overrideId, mBuilder.build())
     }
 
     private fun getStopIntent(): PendingIntent {

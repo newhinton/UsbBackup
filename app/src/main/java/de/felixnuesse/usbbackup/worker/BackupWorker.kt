@@ -75,7 +75,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         }
 
 
-        val db = AppDatabase.Companion.getDatabase(mContext)
+        val db = AppDatabase.getDatabase(mContext)
 
 
         var tasks = arrayListOf<BackupTask>()
@@ -91,93 +91,29 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
         Log.e("WORKER", "Scan tasks... ${tasks.size}")
 
+        val id = (0..Integer.MAX_VALUE).random()
+        mNotifications = Notifications(mContext, id)
+        mNotifications.mUuid = this.id
+
+        var finalMessage = ""
+
         tasks.forEach {
             if(it.enabled){
-                // todo: wrap and catch exceptions
-                mNotifications = Notifications(mContext, it.id!!.toInt())
-                mNotifications.mUuid = this.id
-
-                mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true)
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
+                if(processTask(it)) {
+                    finalMessage += "${it.name} was sucessfully backed up.\n"
 
-                try {
-                    val sourceUri = it.sourceUri.toUri()
-
-
-                    val progress = Progress()
-                    progress.overallSize = calculateSize(DocumentFile.fromTreeUri(mContext, sourceUri)!!)
-
-
-                    var unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
-                    ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use { out ->
-                        if(UriUtils.isFolder(mContext, sourceUri)) {
-                            val folder = DocumentFile.fromTreeUri(mContext, sourceUri)
-                            addToZipRecursive(folder!!, out, "", progress)
-                            out.close()
-                        } else {
-                            //todo: files????
-                        }
-                    }
-
-                    if(this.isStopped) {
-                        unencryptedCacheFile.delete()
-                        mNotifications.dismiss()
-                        return Result.success()
-                    }
-
-                    var targetFolder = DocumentFile.fromTreeUri(mContext, it.targetUri.toUri())
-
-                    var file = try {
-                        targetFolder?.createFile("", getName(it))!!
-                    } catch (e: Exception) {
-                        mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, could not write to storage: ${StorageUtils.state(mContext, it.targetUri.toUri())}")
-                        return@forEach
-                    }
-
-                    if(!it.containerPW.isNullOrBlank()) {
-                        mNotifications.showNotification("Backing up ${it.name}...", "Encrypting...", true, false)
-                        Log.e("Tag", "Encrypting...")
-                        Crypto().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, it.containerPW!!.toCharArray())
-
-                        Log.e("Tag", "Decrypting...")
-                        val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
-                        val target = File(mContext.externalCacheDir, "de_"+getName(it))
-                        Crypto().aesDecrypt(decrypted, target.outputStream(), it.containerPW!!.toCharArray())
-
-                        Log.e("Tag", "Update decrypt-tool...")
-                        var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
-                        decryptToolPath?.let { fileName ->
-                            var targetTool = targetFolder.findFile(fileName)
-                            if(targetTool==null) {
-                                mNotifications.showNotification("Backing up ${it.name}...", "Updating tool...", true)
-                                var decryptTool = targetFolder.createFile("", fileName)!!
-                                mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
-                                    outputStream.write(mContext.assets.open(fileName).readAllBytes())
-                                    outputStream.flush()
-                                }
-                            }
-                        }
-                    } else {
-                        mNotifications.showNotification("Backing up ${it.name}...", "Storing...", true, false)
-                        Log.e("Tag", "Storing...")
-                        mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                            outputStream.write(unencryptedCacheFile.readBytes())
-                            outputStream.flush()
-                        }
-                    }
-
-                    unencryptedCacheFile.delete()
-                    Log.e("Tag", "Done!")
-                    mNotifications.showNotification("Backup Done!", "${it.name} was sucessfully backed up. You can safely remove the media.")
-                } catch (e: Exception) {
-                    Log.e("Tag", "Error: ${e.message}")
-                    e.printStackTrace()
-                    mNotifications.showNotification("Backup Failure!", "Task: ${it.name}, error: ${e.message}")
                 }
             }
         }
 
-        return Result.success()
+        if(finalMessage.isNotBlank()) {
+            finalMessage += "You can safely remove the media."
+            mNotifications.showNotification("Backup Done!", finalMessage)
+            return Result.success()
+        }
+
+        return Result.failure()
     }
 
 
@@ -185,6 +121,93 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         super.onStopped()
         Log.e("Tag", "Was stopped! ${this.id}")
     }
+
+
+    private fun processTask(backupTask: BackupTask): Boolean {
+
+
+        // todo: wrap and catch exceptions
+
+        mNotifications.showNotification("Backing up ${backupTask.name}...", "Zipping...", true)
+
+        try {
+            val sourceUri = backupTask.sourceUri.toUri()
+
+
+            val progress = Progress()
+            progress.overallSize = calculateSize(DocumentFile.fromTreeUri(mContext, sourceUri)!!)
+
+
+            var unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
+            ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use { out ->
+                if(UriUtils.isFolder(mContext, sourceUri)) {
+                    val folder = DocumentFile.fromTreeUri(mContext, sourceUri)
+                    addToZipRecursive(folder!!, out, "", progress)
+                    out.close()
+                } else {
+                    //todo: files????
+                }
+            }
+
+            if(this.isStopped) {
+                unencryptedCacheFile.delete()
+                mNotifications.dismiss()
+                return false
+            }
+
+            var targetFolder = DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())
+
+            var file = try {
+                targetFolder?.createFile("", getName(backupTask))!!
+            } catch (e: Exception) {
+                mNotifications.showNotification("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
+                return false
+            }
+
+            if(!backupTask.containerPW.isNullOrBlank()) {
+                mNotifications.showNotification("Backing up ${backupTask.name}...", "Encrypting...", true, false)
+                Log.e("Tag", "Encrypting...")
+                Crypto().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, backupTask.containerPW!!.toCharArray())
+
+                Log.e("Tag", "Decrypting...")
+                val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
+                val target = File(mContext.externalCacheDir, "de_"+getName(backupTask))
+                Crypto().aesDecrypt(decrypted, target.outputStream(), backupTask.containerPW!!.toCharArray())
+
+                Log.e("Tag", "Update decrypt-tool...")
+                var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
+                decryptToolPath?.let { fileName ->
+                    var targetTool = targetFolder.findFile(fileName)
+                    if(targetTool==null) {
+                        mNotifications.showNotification("Backing up ${backupTask.name}...", "Updating tool...", true)
+                        var decryptTool = targetFolder.createFile("", fileName)!!
+                        mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
+                            outputStream.write(mContext.assets.open(fileName).readAllBytes())
+                            outputStream.flush()
+                        }
+                    }
+                }
+            } else {
+                mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing...", true, false)
+                Log.e("Tag", "Storing...")
+                mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
+                    outputStream.write(unencryptedCacheFile.readBytes())
+                    outputStream.flush()
+                }
+            }
+
+            unencryptedCacheFile.delete()
+            Log.e("Tag", "Done!")
+            mNotifications.showNotification("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
+            return true
+        } catch (e: Exception) {
+            Log.e("Tag", "Error: ${e.message}")
+            e.printStackTrace()
+            mNotifications.showNotification(backupTask.id!!, "Backup Failure!", "Task: ${backupTask.name}, error: ${e.message}")
+        }
+        return false
+    }
+
 
     private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String, progress: Progress) {
         if(this.isStopped) return
