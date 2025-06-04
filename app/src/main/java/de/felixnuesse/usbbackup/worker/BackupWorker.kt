@@ -108,7 +108,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         }
 
         if(finalMessage.isNotBlank()) {
-            finalMessage += "You can safely remove the media."
+            finalMessage += "\nYou can safely remove the media."
             mNotifications.showNotification("Backup Done!", finalMessage)
             return Result.success()
         }

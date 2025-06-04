@@ -54,8 +54,8 @@ class AddActivity : AppCompatActivity() {
         mPrefs = Prefs(this)
 
         binding.sourceUriFolderButton.setOnClickListener { pick(SOURCE_REQUEST_ID, mPrefs.getString(SOURCE_LAST_URI, null)) }
-        binding.targetUriFolderButton.setOnClickListener { pick(TARGET_REQUEST_ID) }
         binding.sourceUriFileButton.setOnClickListener { openDoc(SOURCE_REQUEST_ID) }
+        binding.targetUriFolderButton.setOnClickListener { pick(TARGET_REQUEST_ID) }
 
         binding.nameTextfield.addTextChangedListener(getUpdateableTextWatcher())
         binding.pwTextfield.addTextChangedListener(getUpdateableTextWatcher())

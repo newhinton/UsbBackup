@@ -46,6 +46,8 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             .setSmallIcon(R.drawable.icon_security_key)
             .setContentTitle(title)
             .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+
 
         if(ongoing) {
             mBuilder.setProgress(100, progress, progress == -1)
