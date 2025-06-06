@@ -11,20 +11,16 @@ A small app that allows you to quickly back up important files to thumb-drives!
 <table>
   <tr style="border:none">
     <td style="border:none">
-      <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.jpg" width="360vh" />
+      <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="360vh" />
     </td>
     <td style="border:none">
-      <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="360vh" />
+      <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="360vh" />
     </td>
   </tr>
 </table>
 
 
 ## Features
-|                                                            Cloud Access                                                             |                                    256 Bit Encryption<sup>[1](https://rclone.org/crypt/#file-encryption)</sup>                                     |                                                         Integrated Experience                                                         |
-|:-----------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="https://github.com/newhinton/UsbBackup/blob/master/docs/cloud-computing.png?raw=true" alt="Cloud Access" width="144" />  | <img src="https://github.com/newhinton/UsbBackup/blob/master/docs/locked-padlock.png?raw=true" alt="256 Bit End-to-End Encryption" width="108" /> | <img src="https://github.com/newhinton/UsbBackup/blob/master/docs/smartphone.png?raw=true" alt="Integrated Experience" width="132"/> |
-|                                             Use your cloud storage like a local folder.                                             |                                         Keep your files private on any cloud provider with crypt remotes.                                          |                                  Don't give up features or comfort just because it runs on a phone.                                   |
 
 - **Automation** Automatically start backups! 
 - **Integration** Use any Cloud Provider on your phone as a source!
@@ -75,10 +71,10 @@ You can then build the app normally from Android Studio or from CLI by running:
 
 ```sh
 # Debug build
-./gradlew assembleOssDebug
+./gradlew assembleDebug
 
 # or release build
-./gradlew assembleOssRelease
+./gradlew assembleRelease
 ```
 
 ## Todo:
