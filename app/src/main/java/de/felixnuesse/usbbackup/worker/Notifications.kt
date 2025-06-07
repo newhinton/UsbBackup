@@ -24,7 +24,9 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
     companion object {
         private val NOTIFICATION_CHANNEL_ID = "backup_worker_notifications"
+        private val NOTIFICATION_CHANNEL_ERROR_ID = "backup_worker_error_notifications"
         private val NOTIFICATION_ID = 5691
+        private val NOTIFICATION_ERROR_ID = 15691
     }
 
     var mUuid: UUID? = null
@@ -37,9 +39,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel()
-        }
+        createNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_ID)
@@ -62,6 +62,24 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         mNotificationManager.notify(NOTIFICATION_ID+overrideId, mBuilder.build())
     }
 
+
+    fun showError(title: String, message: String) {
+
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+
+        createErrorNotificationChannel()
+
+        val mBuilder = NotificationCompat.Builder(mContext)
+            .setChannelId(NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon_close)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+
+        mNotificationManager.notify(NOTIFICATION_ERROR_ID+mId, mBuilder.build())
+    }
+
+
     private fun getStopIntent(): PendingIntent {
         val stopIntent = Intent(mContext, NotificationReceiver::class.java)
         stopIntent.setAction(ACTION_STOP)
@@ -75,7 +93,6 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
@@ -84,6 +101,15 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         )
 
         channel.setSound(null, null)
+        mNotificationManager.createNotificationChannel(channel)
+    }
+
+    private fun createErrorNotificationChannel() {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_ERROR_ID,
+            "Backup Worker Error Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
         mNotificationManager.createNotificationChannel(channel)
     }
 }

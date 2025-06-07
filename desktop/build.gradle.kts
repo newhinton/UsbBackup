@@ -6,6 +6,8 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 
+    // don't forget to update the version in the source code
+    version="1.0.0"
     java.sourceSets["main"].java {
         srcDir("..app/src/main/java/")
     }
@@ -37,7 +39,7 @@ tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     archiveBaseName.set("aes-tool")
-    archiveVersion.set("1.0.0")
+    archiveVersion = project.version.toString()
 }
 
 tasks.register<JavaExec>("execute") {

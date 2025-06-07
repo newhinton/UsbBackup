@@ -103,6 +103,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                 if(processTask(it)) {
                     finalMessage += "${it.name} was sucessfully backed up.\n"
 
+                } else {
+                    finalMessage += "Warning: ${it.name} was NOT backed up!\n"
                 }
             }
         }
@@ -133,16 +135,20 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         try {
             val sourceUri = backupTask.sourceUri.toUri()
 
+            var sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
+
+            if(sourceDocument?.canRead() != true) {
+                mNotifications.showError("Error: Could not backup!", "There was an error backing up ${backupTask.name}. We could not read the source folder!")
+                return false
+            }
 
             val progress = Progress()
-            progress.overallSize = calculateSize(DocumentFile.fromTreeUri(mContext, sourceUri)!!)
-
+            progress.overallSize = calculateSize(sourceDocument!!)
 
             var unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
             ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use { out ->
                 if(UriUtils.isFolder(mContext, sourceUri)) {
-                    val folder = DocumentFile.fromTreeUri(mContext, sourceUri)
-                    addToZipRecursive(folder!!, out, "", progress)
+                    addToZipRecursive(sourceDocument, out, "", progress)
                     out.close()
                 } else {
                     //todo: files????
@@ -176,17 +182,11 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
                 Log.e("Tag", "Update decrypt-tool...")
                 var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
-                decryptToolPath?.let { fileName ->
-                    var targetTool = targetFolder.findFile(fileName)
-                    if(targetTool==null) {
-                        mNotifications.showNotification("Backing up ${backupTask.name}...", "Updating tool...", true)
-                        var decryptTool = targetFolder.createFile("", fileName)!!
-                        mContext.contentResolver.openOutputStream(decryptTool.uri)?.use { outputStream ->
-                            outputStream.write(mContext.assets.open(fileName).readAllBytes())
-                            outputStream.flush()
-                        }
-                    }
-                }
+                writeSingleFile(decryptToolPath, targetFolder, backupTask.name, "Updating tool...", false)
+                Log.e("Tag", "Update decrypt-readme...")
+                var decryptReadmePath = mContext.assets.list("")?.firstOrNull { it.startsWith("README") }
+                writeSingleFile(decryptReadmePath, targetFolder, backupTask.name, "Updating readme...", true)
+
             } else {
                 mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing...", true, false)
                 Log.e("Tag", "Storing...")
@@ -242,6 +242,22 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         stream?.close()
     }
 
+    private fun writeSingleFile(path: String?, targetFolder: DocumentFile, taskname: String, task: String, replace: Boolean) {
+        path?.let { fileName ->
+            var targetTool = targetFolder.findFile(fileName)
+            if(targetTool==null || replace) {
+                mNotifications.showNotification("Backing up $taskname...", task, true)
+                var decryptTool = targetFolder.createFile("", fileName)!!
+                if(replace) {
+                    targetTool?.delete()
+                }
+                mContext.contentResolver.openOutputStream(decryptTool.uri, "w")?.use { outputStream ->
+                    outputStream.write(mContext.assets.open(fileName).readAllBytes())
+                    outputStream.flush()
+                }
+            }
+        }
+    }
 
     private fun getName(task: BackupTask): String {
         val date = Date(System.currentTimeMillis())

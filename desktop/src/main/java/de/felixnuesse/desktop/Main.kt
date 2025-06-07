@@ -48,6 +48,11 @@ class AesTool : CliktCommand() {
             target
         }
 
+        if(targetFile.exists()) {
+            System.err.println("Target file exists, aborting!")
+            return
+        }
+
         if(encrypt) {
             Crypto().aesEncrypt(FileInputStream(source), FileOutputStream(targetFile), password.toCharArray())
         } else {

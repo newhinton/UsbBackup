@@ -70,6 +70,14 @@ You can then build the app normally from Android Studio or from CLI by running:
 ./gradlew assembleRelease
 ```
 
+The desktop-app can be build with:
+
+
+```sh
+./gradlew jar
+
+```
+
 ## Todo:
 
 - Passwords in AddView

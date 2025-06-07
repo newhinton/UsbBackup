@@ -71,11 +71,16 @@ dependencies {
 }
 
 tasks.register<Copy>("deployDesktop") {
+    val desktopVersion = project(":desktop").version
+
     dependsOn(":desktop:jar")
-    println("${rootDir}/desktop/build/libs/aes-tool-1.0.0.jar")
-    from("${rootDir}/desktop/build/libs/aes-tool-1.0.0.jar")
+    println("${rootDir}/desktop/build/libs/aes-tool-$desktopVersion.jar")
+    from("${rootDir}/desktop/build/libs/aes-tool-$desktopVersion.jar")
     into("${rootDir}/app/src/main/assets/")
-    include("*.jar")
+    include("*.jar", "*.md")
+
+    from("${rootDir}/desktop/README.md")
+    into("${rootDir}/app/src/main/assets/")
 }
 
 
