@@ -1,5 +1,6 @@
 package de.felixnuesse.usbbackup
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -18,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageId
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTaskDao
 import de.felixnuesse.usbbackup.databinding.ActivityAddBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,18 +28,26 @@ import kotlinx.coroutines.withContext
 
 class AddActivity : AppCompatActivity() {
 
-
     companion object {
         private const val SOURCE_REQUEST_ID = 423
         private const val TARGET_REQUEST_ID = 424
         private const val SOURCE_LAST_URI = "SOURCE_LAST_URI"
+        private const val INTENT_EXTRA_ID = "INTENT_EXTRA_ID"
+
+        public fun startEdit(id: Int, context: Context) {
+            var editIntent = Intent(context, AddActivity::class.java)
+            editIntent.putExtra(INTENT_EXTRA_ID, id)
+            context.startActivity(editIntent)
+        }
     }
 
     private lateinit var binding: ActivityAddBinding
     private lateinit var mPrefs: Prefs
+    private lateinit var mBackupDao: BackupTaskDao
 
     private var mSourceUri: Uri? = null
     private var mTargetUri: Uri? = null
+    private var mExistingId: Int = -1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,6 +62,10 @@ class AddActivity : AppCompatActivity() {
         }
 
         mPrefs = Prefs(this)
+        mBackupDao = AppDatabase.Companion.getDatabase(this@AddActivity).backupDao()
+
+        prepareView(intent)
+
 
         binding.sourceUriFolderButton.setOnClickListener { pick(SOURCE_REQUEST_ID, mPrefs.getString(SOURCE_LAST_URI, null)) }
         binding.sourceUriFileButton.setOnClickListener { openDoc(SOURCE_REQUEST_ID) }
@@ -67,19 +81,43 @@ class AddActivity : AppCompatActivity() {
 
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    val db = AppDatabase.Companion.getDatabase(this@AddActivity)
                     var backup = BackupTask.new(binding.nameTextfield.text.toString(), mSourceUri.toString(), mTargetUri.toString())
 
                     if (binding.pwTextfield.text.toString().isNotBlank()) {
                         backup.containerPW = binding.pwTextfield.text.toString()
                     }
 
-                    db.backupDao().insert(backup)
+                    if(mExistingId == -1) {
+                        mBackupDao.insert(backup)
+                    } else {
+                        backup.id = mExistingId
+                        mBackupDao.update(backup)
+                    }
                 }
             }
             finish()
         }
 
+    }
+
+    private fun prepareView(intent: Intent) {
+        mExistingId = intent.getIntExtra(INTENT_EXTRA_ID, -1)
+        if(mExistingId == -1) return
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                var existing = mBackupDao.get(mExistingId)
+                runOnUiThread(object : Runnable {
+                    override fun run() {
+                        binding.nameTextfield.setText(existing.name)
+                        mSourceUri = existing.sourceUri.toUri()
+                        mTargetUri = existing.targetUri.toUri()
+                        binding.pwTextfield.setText(existing.containerPW)
+                        updateUi()
+                    }
+                })
+            }
+        }
     }
 
     private fun pick(id: Int, initialUriString: String? = null) {

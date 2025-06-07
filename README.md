@@ -80,9 +80,6 @@ The desktop-app can be build with:
 
 ## Todo:
 
-- Passwords in AddView
-- Readme in assets for extraction tool
-- EditView
 - Option to switch between usb-detection modes
 - file support
 - folder/filepicker selector popup

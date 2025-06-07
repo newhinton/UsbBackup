@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class BackupTask (
-    @PrimaryKey val id: Int? = null,
+    @PrimaryKey var id: Int? = null,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "sourceUri") val sourceUri: String,
     @ColumnInfo(name = "targetUri") val targetUri: String,

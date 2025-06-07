@@ -95,6 +95,10 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
     override fun click(task: BackupTask, menuItemId: Int): Boolean {
         return when(menuItemId) {
+            R.id.taskMenuItemEdit -> {
+                AddActivity.startEdit(task.id!!, this@MainActivity)
+                true
+            }
             R.id.taskMenuItemDelete -> {
                 ConfirmDialog(this@MainActivity, this@MainActivity).showDialog(task.id!!, task.name)
                 true
