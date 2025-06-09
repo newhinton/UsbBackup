@@ -99,7 +99,8 @@
                 android:scaleType="centerInside"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/icon_more_vert" />
+                app:srcCompat="@drawable/icon_more_vert"
+                app:tint="?attr/colorPrimary" />
 
             <TextView
                 android:id="@+id/noPasswordTextView"
@@ -128,7 +129,8 @@
                     android:id="@+id/imageView2"
                     android:layout_width="48dp"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/icon_harddisk_check" />
+                    app:srcCompat="@drawable/icon_harddisk_check"
+                    app:tint="?attr/colorPrimary" />
 
                 <TextView
                     android:id="@+id/textView"
@@ -146,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:minWidth="0dp"
-                    app:iconTint="@null"
+                    app:iconTint="?attr/colorOnPrimary"
                     app:icon="@drawable/icon_backup"
                     app:iconPadding="0dp"
                     app:layout_constraintEnd_toEndOf="parent"

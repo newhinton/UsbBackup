@@ -24,7 +24,7 @@
             android:id="@+id/nameTextfield"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Title of the Task" />
+            android:hint="@string/title_of_the_task" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.cardview.widget.CardView
@@ -51,7 +51,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:singleLine="true"
-                android:text="Select either a folder or a file"
+                android:text="@string/select_a_source_folder"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFileButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -75,6 +75,7 @@
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/icon_insert_drive_file"
+                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
                 app:layout_constraintTop_toTopOf="@+id/sourceUri"
@@ -88,6 +89,7 @@
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/icon_folder"
+                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
@@ -100,7 +102,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUriMetadata"
-                app:srcCompat="@drawable/icon_arrow_downward" />
+                app:srcCompat="@drawable/icon_arrow_downward"
+                app:tint="?attr/colorPrimary" />
 
             <TextView
                 android:id="@+id/targetUri"
@@ -109,7 +112,7 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
                 android:singleLine="true"
-                android:text="Select a targetfolder"
+                android:text="@string/select_a_targetfolder"
                 app:layout_constraintEnd_toStartOf="@+id/targetUriFolderButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
@@ -131,6 +134,7 @@
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/icon_folder"
+                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/targetUri" />
@@ -154,7 +158,7 @@
             android:id="@+id/pwTextfield"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password" />
+            android:hint="@string/password" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -183,7 +187,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="Warning! No password set. Backup will be unencrypted!"
+            android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
             android:textColor="#D00000" />
     </LinearLayout>
 

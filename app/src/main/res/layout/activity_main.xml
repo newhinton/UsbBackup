@@ -48,7 +48,8 @@
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:background="@null"
-                android:src="@drawable/icon_more" />
+                android:src="@drawable/icon_more"
+                app:tint="?attr/colorPrimary" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
