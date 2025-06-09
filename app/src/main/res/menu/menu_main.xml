@@ -4,10 +4,10 @@
       tools:context="de.felixnuesse.timedsilence.MainActivity">
 
     <item
-        android:id="@+id/action_exit"
-        android:icon="@drawable/icon_close"
+        android:id="@+id/action_about"
+        android:icon="@drawable/icon_info"
         android:orderInCategory="1"
-        android:title="@string/back"
+        android:title="@string/about"
         app:showAsAction="always" />
 
 </menu>

@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.PopupMenu
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.appcompat.app.AppCompatActivity
@@ -64,8 +65,8 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
             startActivity(Intent(this, AddActivity::class.java))
         }
 
-        binding.aboutButton.setOnClickListener {
-            startActivity(Intent(this, AboutActivity::class.java))
+        binding.moreButton.setOnClickListener {
+            getPopupMenu().show()
         }
 
         mDb = AppDatabase.Companion.getDatabase(this@MainActivity)
@@ -166,5 +167,22 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pushNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+
+
+    fun getPopupMenu(): PopupMenu {
+        val popupMenu = PopupMenu(this, binding.moreButton)
+        popupMenu.menuInflater.inflate(R.menu.menu_main, popupMenu.menu)
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            when(menuItem.itemId) {
+                R.id.action_about -> {
+                    startActivity(Intent(this, AboutActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+        return popupMenu
     }
 }

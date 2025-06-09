@@ -21,5 +21,6 @@
 
     <string name="intro_slide_done_title">Done!</string>
     <string name="intro_slide_done_description">You are now ready to start! You can now configure your backups!</string>
+    <string name="about">About</string>
 
 </resources>
