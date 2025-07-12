@@ -9,11 +9,24 @@ import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.Source
 import de.felixnuesse.usbbackup.databinding.RecyclerviewSourceBinding
 
-class SourceListAdapter(private val sources: List<Source>, private val mContext: Context) : RecyclerView.Adapter<SourceListAdapter.Row>() {
+class SourceListAdapter(private val sources: List<Source>, private val mContext: Context, private val callbacks: SourceItemCallback) : RecyclerView.Adapter<SourceListAdapter.Row>() {
 
     inner class Row(var binding: RecyclerviewSourceBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setTask(source: Source) {
             binding.source.text = getUriMetadata(mContext, source.uri.toUri())
+
+            binding.source.isChecked = source.encrypt
+
+
+
+
+            binding.deleteButton.setOnClickListener {
+                callbacks.delete(source.uri)
+            }
+
+            binding.source.setOnCheckedChangeListener { view, isChecked ->
+                callbacks.encrypted(source.uri, isChecked)
+            }
         }
     }
 

@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class AddActivity : AppCompatActivity() {
+class AddActivity : AppCompatActivity(), SourceItemCallback {
 
     companion object {
         private const val SOURCE_REQUEST_ID = 423
@@ -149,10 +149,8 @@ class AddActivity : AppCompatActivity() {
             binding.saveFab.visibility = View.INVISIBLE
         }
 
-        if(!mSourceList.isEmpty()) {
-            binding.sourceList.layoutManager = LinearLayoutManager(this)
-            binding.sourceList.adapter = SourceListAdapter(mSourceList, this)
-        }
+        binding.sourceList.layoutManager = LinearLayoutManager(this)
+        binding.sourceList.adapter = SourceListAdapter(mSourceList, this, this)
 
         if(mTargetUri!=null) {
             binding.targetUri.text = mTargetUri.toString()
@@ -196,6 +194,22 @@ class AddActivity : AppCompatActivity() {
             }
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        }
+    }
+
+    override fun delete(uri: String) {
+        System.err.println("DELETE: $uri ${mSourceList.size}")
+        mSourceList.removeIf { it.uri == uri }
+        updateUi()
+
+        System.err.println("DELETE: $uri ${mSourceList.size}")
+    }
+
+    override fun encrypted(uri: String, isEncrypted: Boolean) {
+        mSourceList.forEach {
+            if(it.uri == uri) {
+                it.encrypt = isEncrypted
+            }
         }
     }
 }
