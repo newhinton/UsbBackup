@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.DocumentsContract
 import android.text.Editable
 import android.text.TextWatcher
@@ -16,10 +18,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageId
-import de.felixnuesse.usbbackup.database.AppDatabase
+import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
-import de.felixnuesse.usbbackup.database.BackupTaskDao
+import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
+import de.felixnuesse.usbbackup.database.Source
 import de.felixnuesse.usbbackup.databinding.ActivityAddBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,9 +47,9 @@ class AddActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddBinding
     private lateinit var mPrefs: Prefs
-    private lateinit var mBackupDao: BackupTaskDao
+    private lateinit var mbackupMiddleware: BackupTaskMiddleware
 
-    private var mSourceUri: Uri? = null
+    private var mSourceList = arrayListOf<Source>()
     private var mTargetUri: Uri? = null
     private var mExistingId: Int = -1
 
@@ -62,7 +66,7 @@ class AddActivity : AppCompatActivity() {
         }
 
         mPrefs = Prefs(this)
-        mBackupDao = AppDatabase.Companion.getDatabase(this@AddActivity).backupDao()
+        mbackupMiddleware = BackupTaskMiddleware.get(this@AddActivity)
 
         prepareView(intent)
 
@@ -77,21 +81,23 @@ class AddActivity : AppCompatActivity() {
 
         binding.saveFab.setOnClickListener {
             mTargetUri?.let { uri -> persist(uri) }
-            mSourceUri?.let { uri -> persist(uri) }
+            mSourceList.forEach {
+                persist(it.uri.toUri())
+            }
 
             lifecycleScope.launch {
                 withContext(Dispatchers.IO) {
-                    var backup = BackupTask.new(binding.nameTextfield.text.toString(), mSourceUri.toString(), mTargetUri.toString())
+                    val backup = BackupTask.new(binding.nameTextfield.text.toString(), mSourceList, mTargetUri.toString())
 
                     if (binding.pwTextfield.text.toString().isNotBlank()) {
                         backup.containerPW = binding.pwTextfield.text.toString()
                     }
 
                     if(mExistingId == -1) {
-                        mBackupDao.insert(backup)
+                        mbackupMiddleware.insert(backup)
                     } else {
                         backup.id = mExistingId
-                        mBackupDao.update(backup)
+                        mbackupMiddleware.update(backup)
                     }
                 }
             }
@@ -106,16 +112,16 @@ class AddActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                var existing = mBackupDao.get(mExistingId)
-                runOnUiThread(object : Runnable {
-                    override fun run() {
-                        binding.nameTextfield.setText(existing.name)
-                        mSourceUri = existing.sourceUri.toUri()
-                        mTargetUri = existing.targetUri.toUri()
-                        binding.pwTextfield.setText(existing.containerPW)
-                        updateUi()
-                    }
-                })
+                val existing = mbackupMiddleware.get(mExistingId)
+                mSourceList = existing.sources
+                runOnUiThread {
+                    binding.nameTextfield.setText(existing.name)
+                    //mSourceUri = existing.sourceUri.toUri()
+                    mTargetUri = existing.targetUri.toUri()
+                    binding.pwTextfield.setText(existing.containerPW)
+
+                    updateUi()
+                }
             }
         }
     }
@@ -137,20 +143,20 @@ class AddActivity : AppCompatActivity() {
     }
 
     private fun updateUi() {
-        if (mSourceUri != null && mTargetUri != null && !binding.nameTextfield.text.toString().isBlank()) {
+        if (!mSourceList.isEmpty() && mTargetUri != null && !binding.nameTextfield.text.toString().isBlank()) {
             binding.saveFab.visibility = View.VISIBLE
         } else {
             binding.saveFab.visibility = View.INVISIBLE
         }
 
-        if(mSourceUri!=null) {
-            binding.sourceUri.text = mSourceUri.toString()
-            setUriMetadata(binding.sourceUriMetadata, mSourceUri)
+        if(!mSourceList.isEmpty()) {
+            binding.sourceList.layoutManager = LinearLayoutManager(this)
+            binding.sourceList.adapter = SourceListAdapter(mSourceList, this)
         }
 
         if(mTargetUri!=null) {
             binding.targetUri.text = mTargetUri.toString()
-            setUriMetadata(binding.targetUriMetadata, mTargetUri)
+            binding.targetUriMetadata.text = getUriMetadata(this, mTargetUri)
         }
 
         binding.layoutNoPassword.visibility = if (binding.pwTextfield.text.toString().isBlank()) {
@@ -160,27 +166,14 @@ class AddActivity : AppCompatActivity() {
         }
     }
 
-    private fun setUriMetadata(view: TextView, uri: Uri?) {
-        if(uri != null) {
-            var id = getStorageId(uri)
-            try {
-                val folder = DocumentFile.fromTreeUri(this, uri)
-                view.text = "$id: ${folder?.name}"
-            } catch (e: Exception) {
-                val file = DocumentFile.fromSingleUri(this, uri)
-                view.text = "$id: ${file?.name}"
-            }
-        }
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
 
         if(resultCode == RESULT_OK) {
             when(requestCode) {
                 SOURCE_REQUEST_ID -> resultData?.data?.also {
-                    uri -> mSourceUri = uri
-                    mPrefs.setString("SOURCE_LAST_URI", mSourceUri.toString())
+                    uri -> mSourceList.add(Source(-1, uri.toString(), false))
+                    mPrefs.setString("SOURCE_LAST_URI", uri.toString())
                 }
                 TARGET_REQUEST_ID -> resultData?.data?.also {
                     uri -> mTargetUri = uri

@@ -16,10 +16,7 @@ interface BackupTaskDao {
     fun get(id: Int): BackupTask
 
     @Insert
-    fun insertAll(vararg entry: BackupTask)
-
-    @Insert
-    fun insert(entry: BackupTask)
+    fun insert(entry: BackupTask): Long
 
     @Update
     fun update(entry: BackupTask)

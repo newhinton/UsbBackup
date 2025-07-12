@@ -133,7 +133,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         mNotifications.showNotification("Backing up ${backupTask.name}...", "Zipping...", true)
 
         try {
-            val sourceUri = backupTask.sourceUri.toUri()
+            // todo: was source
+            val sourceUri = backupTask.targetUri.toUri()
 
             var sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
 

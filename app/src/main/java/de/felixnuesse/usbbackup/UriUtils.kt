@@ -40,5 +40,20 @@ class UriUtils {
             val file = DocumentFile.fromSingleUri(context, uri)
             return file?.name.toString()
         }
+
+        fun getUriMetadata(context: Context, uri: Uri?): String {
+            if(uri == null) {
+                return "Uri is null!"
+            }
+
+            val id = getStorageId(uri)
+            try {
+                val folder = DocumentFile.fromTreeUri(context, uri)
+                return "$id: ${folder?.name}"
+            } catch (e: Exception) {
+                val file = DocumentFile.fromSingleUri(context, uri)
+                return "$id: ${file?.name}"
+            }
+        }
     }
 }

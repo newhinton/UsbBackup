@@ -5,12 +5,16 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [BackupTask::class], version = 1)
+
+@Database(entities = [BackupTask::class, Source::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun backupDao(): BackupTaskDao
+    abstract fun sourceDao(): SourceDao
+
 
     companion object {
+
         fun getDatabase(context: Context): AppDatabase {
             val db = Room.databaseBuilder(
                 context,
@@ -18,6 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
             )
                 .fallbackToDestructiveMigration()
                 .build()
+
+
             return db
         }
     }

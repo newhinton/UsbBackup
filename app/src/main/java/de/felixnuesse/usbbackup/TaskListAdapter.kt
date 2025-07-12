@@ -24,11 +24,13 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 binding.title.paintFlags = binding.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
 
-            var sourceUri = task.sourceUri.toUri()
+            // todo
+            var sourceUri = task.targetUri.toUri()
             var targetUri = task.targetUri.toUri()
             var targetUriName = UriUtils.getStorageId(targetUri)
 
-            binding.source.text = "${UriUtils.getStorageId(sourceUri)}: ${UriUtils.getName(mContext, sourceUri)}"
+            //todo:
+            //binding.source.text = "${UriUtils.getStorageId(sourceUri)}: ${UriUtils.getName(mContext, sourceUri)}"
             binding.target.text = targetUriName
 
             var menu = getPopupMenu(binding.moreButton, task)

@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.storage.StorageManager
+import android.os.storage.StorageVolume
 import android.util.Log
 import de.felixnuesse.usbbackup.worker.BackupWorker
 
@@ -19,8 +20,13 @@ class MediaBroadcastReceiver: BroadcastReceiver() {
         Log.e("TAG", "Recieved Broadcast!")
 
 
-        var sm = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-        var preMountVolumes = sm.storageVolumes
+        context.contentResolver.persistedUriPermissions.forEach {
+            Log.e("TAG", "PP ${it.uri} ${it.toString()}")
+        }
+
+
+        var storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+        var preMountVolumes = storageManager.storageVolumes
 
 
 
@@ -33,17 +39,29 @@ class MediaBroadcastReceiver: BroadcastReceiver() {
             //Log.e("TAG", "Device: ${device.toString()}")
 
             Log.e("TAG", "It was a media broadcast: ${intent.action}")
-            Handler(Looper.getMainLooper()).postDelayed({
-                // this requires timing, and a lot of assumptions. MEDIA_MOUNT would truly be better
-                var newDrive = sm.storageVolumes.filter { it !in preMountVolumes }.toList().first()
-                BackupWorker.Companion.now(context, newDrive.uuid.toString())
-            }, 5000)
-
-
+            tryFindingNewVolume(context, 1000, storageManager, preMountVolumes, 5)
         }
 
         if (intent.action!!.matches(Regex("MEDIA_[a-zA-Z]+"))) {
             Log.e("TAG", "It was a media broadcast: ${intent.action}")
         }
+    }
+
+
+    fun tryFindingNewVolume(context: Context, delay: Long, storageManager: StorageManager, preMountVolumes: List<StorageVolume>, iterationsLeft: Int) {
+
+        // todo: handle notification
+        Handler(Looper.getMainLooper()).postDelayed({
+            // this requires timing, and a lot of assumptions. MEDIA_MOUNT would truly be better
+            val newDrive = storageManager.storageVolumes.filter { it !in preMountVolumes }.toList().firstOrNull()
+            if(newDrive == null) {
+                if(iterationsLeft > 0) {
+                    tryFindingNewVolume(context, delay, storageManager, preMountVolumes, iterationsLeft - 1)
+                }
+            } else {
+                BackupWorker.Companion.now(context, newDrive.uuid.toString())
+            }
+        }, delay)
+
     }
 }
