@@ -9,6 +9,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
 import de.felixnuesse.usbbackup.worker.BackupWorker
@@ -24,13 +25,11 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 binding.title.paintFlags = binding.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             }
 
-            // todo
-            var sourceUri = task.targetUri.toUri()
-            var targetUri = task.targetUri.toUri()
-            var targetUriName = UriUtils.getStorageId(targetUri)
 
-            //todo:
-            //binding.source.text = "${UriUtils.getStorageId(sourceUri)}: ${UriUtils.getName(mContext, sourceUri)}"
+            val targetUri = task.targetUri.toUri()
+            val targetUriName = UriUtils.getStorageId(targetUri)
+
+            binding.source.text = task.sources.joinToString("\n") { getUriMetadata(mContext, it.uri.toUri())}
             binding.target.text = targetUriName
 
             var menu = getPopupMenu(binding.moreButton, task)

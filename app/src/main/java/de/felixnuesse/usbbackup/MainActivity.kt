@@ -1,6 +1,5 @@
 package de.felixnuesse.usbbackup
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -14,9 +13,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
-import de.felixnuesse.usbbackup.database.BackupTaskDao
+import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.InputDialog
@@ -30,8 +28,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mDb: AppDatabase
-    private lateinit var mTaskDao: BackupTaskDao
+    private lateinit var mBackupTaskMiddleware: BackupTaskMiddleware
     private lateinit var mPreferences: Prefs
 
 
@@ -69,8 +66,8 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
             getPopupMenu().show()
         }
 
-        mDb = AppDatabase.Companion.getDatabase(this@MainActivity)
-        mTaskDao = mDb.backupDao()
+
+        mBackupTaskMiddleware = BackupTaskMiddleware.get(this)
         updateList()
     }
 
@@ -83,7 +80,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     fun updateList() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val adapter = TaskListAdapter(mTaskDao.getAll(), this@MainActivity, this@MainActivity)
+                val adapter = TaskListAdapter(mBackupTaskMiddleware.getAll(), this@MainActivity, this@MainActivity)
 
                 val handler = Handler(Looper.getMainLooper())
                 handler.post {
@@ -112,7 +109,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         task.containerPW = null
-                        mTaskDao.update(task)
+                        mBackupTaskMiddleware.update(task)
                         updateList()
                     }
                 }
@@ -122,7 +119,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         task.enabled = true
-                        mTaskDao.update(task)
+                        mBackupTaskMiddleware.update(task)
                         updateList()
                     }
                 }
@@ -132,7 +129,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         task.enabled = false
-                        mTaskDao.update(task)
+                        mBackupTaskMiddleware.update(task)
                         updateList()
                     }
                 }
@@ -146,9 +143,9 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     override fun setText(text: String, id: Int) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                var task = mTaskDao.get(id)
+                var task = mBackupTaskMiddleware.get(id)
                 task.containerPW = text
-                mTaskDao.update(task)
+                mBackupTaskMiddleware.update(task)
                 updateList()
             }
         }
@@ -157,7 +154,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     override fun confirmDelete(id: Int) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                mTaskDao.deleteById(id)
+                mBackupTaskMiddleware.deleteById(id)
                 updateList()
             }
         }

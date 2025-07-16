@@ -15,6 +15,9 @@ import de.felixnuesse.usbbackup.StorageUtils
 import de.felixnuesse.usbbackup.UriUtils
 import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
+import de.felixnuesse.usbbackup.fs.FsUtils
+import de.felixnuesse.usbbackup.fs.ZipUtils
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -22,9 +25,12 @@ import java.util.Date
 import java.util.UUID
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import kotlin.text.format
 
-class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams) {
+class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams), StateCallback {
 
+    private var zipUtils = ZipUtils(mContext, this)
+    private var fsUtils = FsUtils(mContext, this)
 
     inner class Progress() {
         var overallSize = 0L
@@ -67,27 +73,23 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     override fun doWork(): Result {
 
-        var storageId = inputData.getString("storageId")
-        var taskId = inputData.getInt("taskId", -1)
+        val storageId = inputData.getString("storageId")
+        val taskId = inputData.getInt("taskId", -1)
 
         if(storageId == null && taskId == -1) {
             return Result.failure()
         }
 
-
-        val db = AppDatabase.getDatabase(mContext)
-
-
-        var tasks = arrayListOf<BackupTask>()
+        val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
+        val tasks = arrayListOf<BackupTask>()
 
         if(storageId != null) {
-            tasks.addAll(db.backupDao().getAll().filter { UriUtils.getStorageId(it.targetUri.toUri()) == storageId })
+            tasks.addAll(backupTaskMiddleware.getAll().filter { UriUtils.getStorageId(it.targetUri.toUri()) == storageId })
         }
 
         if(taskId != -1) {
-            tasks.add(db.backupDao().get(taskId))
+            tasks.add(backupTaskMiddleware.get(taskId))
         }
-
 
         Log.e("WORKER", "Scan tasks... ${tasks.size}")
 
@@ -100,11 +102,10 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         tasks.forEach {
             if(it.enabled){
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
-                if(processTask(it)) {
-                    finalMessage += "${it.name} was sucessfully backed up.\n"
-
+                finalMessage += if(processTask(it)) {
+                    "${it.name} was sucessfully backed up.\n"
                 } else {
-                    finalMessage += "Warning: ${it.name} was NOT backed up!\n"
+                    "Warning: ${it.name} was NOT backed up!\n"
                 }
             }
         }
@@ -118,86 +119,88 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         return Result.failure()
     }
 
-
     override fun onStopped() {
         super.onStopped()
         Log.e("Tag", "Was stopped! ${this.id}")
     }
 
-
     private fun processTask(backupTask: BackupTask): Boolean {
-
-
-        // todo: wrap and catch exceptions
 
         mNotifications.showNotification("Backing up ${backupTask.name}...", "Zipping...", true)
 
+        val targetFolder = try {
+            DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())?.createDirectory("date_${getFormattedDate()}")!!
+        } catch (e: Exception) {
+            mNotifications.showNotification("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
+            return false
+        }
+
+        val unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
+        unencryptedCacheFile.createNewFile()
+
+        val progress = Progress()
         try {
-            // todo: was source
-            val sourceUri = backupTask.targetUri.toUri()
-
-            var sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
-
-            if(sourceDocument?.canRead() != true) {
-                mNotifications.showError("Error: Could not backup!", "There was an error backing up ${backupTask.name}. We could not read the source folder!")
-                return false
+            backupTask.sources.forEach {
+                progress.overallSize += calculateSize(DocumentFile.fromTreeUri(mContext, it.uri.toUri())!!)
             }
 
-            val progress = Progress()
-            progress.overallSize = calculateSize(sourceDocument!!)
+            // todo: maybe use following scheme:
+            //      ./date/encrypted.zip
+            //      ./date/decryptedA
+            //      ./date/decryptedB
+            //      ./readme,etc
 
-            var unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
-            ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use { out ->
-                if(UriUtils.isFolder(mContext, sourceUri)) {
-                    addToZipRecursive(sourceDocument, out, "", progress)
-                    out.close()
-                } else {
-                    //todo: files????
+            // todo: create the date folder in the cache dir, and then move that after everything else.
+            // That way, we dont leave half a backup if something breaks!
+
+            ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use {
+                backupTask.sources.forEach { source ->
+
+                    val sourceUri = source.uri.toUri()
+                    val sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
+                    if(sourceDocument?.canRead() != true) {
+                        mNotifications.showError("Error: Could not backup!", "There was an error backing up ${backupTask.name}. We could not read the source folder!")
+                        return false
+                    }
+
+                    if(UriUtils.isFolder(mContext, sourceUri)) {
+                        val namedPath = UriUtils.getName(mContext, sourceUri)
+                        if(source.encrypt) {
+                            zipUtils.addToZipRecursive(sourceDocument, it, "$namedPath/", progress)
+                        } else {
+                            mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing Folder...", true, false)
+                            Log.e("Tag", "Storing folder...")
+                            fsUtils.copyFolder(sourceDocument, targetFolder.createDirectory(namedPath)!!)
+                        }
+                    } else {
+                        //todo: files????
+                    }
+
+                    if(this.isStopped) {
+                        unencryptedCacheFile.delete()
+                        mNotifications.dismiss()
+                        return false
+                    }
                 }
             }
 
-            if(this.isStopped) {
-                unencryptedCacheFile.delete()
-                mNotifications.dismiss()
-                return false
-            }
+            val encryptedTasks = backupTask.sources.filter { it.encrypt }.toList()
 
-            var targetFolder = DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())
 
-            var file = try {
-                targetFolder?.createFile("", getName(backupTask))!!
-            } catch (e: Exception) {
-                mNotifications.showNotification("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
-                return false
-            }
+            if(!encryptedTasks.isEmpty()) {
+                if(backupTask.containerPW.isNullOrBlank()) {
+                    Log.e("Tag", "Could not encrypt since password not set! Abort!")
+                    return false
+                }
 
-            if(!backupTask.containerPW.isNullOrBlank()) {
                 mNotifications.showNotification("Backing up ${backupTask.name}...", "Encrypting...", true, false)
-                Log.e("Tag", "Encrypting...")
-                Crypto().aesEncrypt(unencryptedCacheFile.inputStream(), mContext.contentResolver.openOutputStream(file.uri)!!, backupTask.containerPW!!.toCharArray())
-
-                Log.e("Tag", "Decrypting...")
-                val decrypted = mContext.contentResolver.openInputStream(file.uri)!!
-                val target = File(mContext.externalCacheDir, "de_"+getName(backupTask))
-                Crypto().aesDecrypt(decrypted, target.outputStream(), backupTask.containerPW!!.toCharArray())
-
-                Log.e("Tag", "Update decrypt-tool...")
-                var decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
-                writeSingleFile(decryptToolPath, targetFolder, backupTask.name, "Updating tool...", false)
-                Log.e("Tag", "Update decrypt-readme...")
-                var decryptReadmePath = mContext.assets.list("")?.firstOrNull { it.startsWith("README") }
-                writeSingleFile(decryptReadmePath, targetFolder, backupTask.name, "Updating readme...", true)
-
-            } else {
-                mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing...", true, false)
-                Log.e("Tag", "Storing...")
-                mContext.contentResolver.openOutputStream(file.uri)?.use { outputStream ->
-                    outputStream.write(unencryptedCacheFile.readBytes())
-                    outputStream.flush()
+                if(!handleEncryption(targetFolder, backupTask, unencryptedCacheFile)) {
+                    return false
                 }
+                handleEncryptionTools(targetFolder, backupTask)
             }
-
             unencryptedCacheFile.delete()
+
             Log.e("Tag", "Done!")
             mNotifications.showNotification("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
             return true
@@ -209,46 +212,43 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         return false
     }
 
+    private fun handleEncryption(targetFolder: DocumentFile, backupTask: BackupTask, source: File): Boolean {
 
-    private fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String, progress: Progress) {
-        if(this.isStopped) return
-        current.listFiles().forEach {
-            mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true, false, progress.getProgress())
-            //Log.e("Tag", "Processing: $path${it.name}")
-            if(it.isDirectory) {
-                val entry = ZipEntry("$path${it.name}/")
-                zip.putNextEntry(entry)
-                zip.closeEntry()
-                // overall size is wrong here. That "resets" the percentage. ideally, we use a "global" variable for both overallSize and calculated size.
-                addToZipRecursive(it, zip, "$path${it.name}/", progress)
-            }
-            if(it.isFile) {
-                progress.calculatedSize += it.length()
-                val entry = ZipEntry("$path${it.name}")
-                zip.putNextEntry(entry)
-                writeToZip(zip, it.uri)
-                zip.closeEntry()
-            }
-        }
+        val password = backupTask.containerPW!!.toCharArray()
+        val encryptedZipUri = targetFolder.createFile("", "encrypted_backup.zip")!!.uri
+
+
+        Log.e("Tag", "Encrypting...")
+        val targetFile = mContext.contentResolver.openOutputStream(encryptedZipUri)!!
+        Crypto().aesEncrypt(source.inputStream(), targetFile, password)
+
+        Log.e("Tag", "Decrypting...")
+        val decrypted = mContext.contentResolver.openInputStream(encryptedZipUri)!!
+        val target = File(mContext.externalCacheDir, "de_"+getName(backupTask))
+
+        Log.e("Tag", "Decrypting: ${target.absolutePath}")
+        Crypto().aesDecrypt(decrypted, target.outputStream(), password)
+        return true
     }
 
-    private fun writeToZip(zip: ZipOutputStream, uri: Uri) {
-        var stream = mContext.contentResolver.openInputStream(uri)
-        val buffer = ByteArray(16384)
+    private fun handleEncryptionTools(targetFolder: DocumentFile, backupTask: BackupTask) {
+        val decryptToolPath = mContext.assets.list("")?.firstOrNull { it.startsWith("aes-tool") }
+        val decryptReadmePath = mContext.assets.list("")?.firstOrNull { it.startsWith("README") }
 
-        var bytesRead: Int
-        while (stream?.read(buffer).also { bytesRead = it ?: -1 } != -1) {
-            zip.write(buffer, 0, bytesRead)
-        }
-        stream?.close()
+        Log.e("Tag", "Update decrypt-tool...")
+        writeSingleFile(decryptToolPath, targetFolder, backupTask.name, "Updating tool...", false)
+        Log.e("Tag", "Update decrypt-readme...")
+        writeSingleFile(decryptReadmePath, targetFolder, backupTask.name, "Updating readme...", true)
     }
 
-    private fun writeSingleFile(path: String?, targetFolder: DocumentFile, taskname: String, task: String, replace: Boolean) {
+
+
+    fun writeSingleFile(path: String?, targetFolder: DocumentFile, taskname: String, task: String, replace: Boolean) {
         path?.let { fileName ->
-            var targetTool = targetFolder.findFile(fileName)
+            val targetTool = targetFolder.findFile(fileName)
             if(targetTool==null || replace) {
                 mNotifications.showNotification("Backing up $taskname...", task, true)
-                var decryptTool = targetFolder.createFile("", fileName)!!
+                val decryptTool = targetFolder.createFile("", fileName)!!
                 if(replace) {
                     targetTool?.delete()
                 }
@@ -260,13 +260,16 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         }
     }
 
-    private fun getName(task: BackupTask): String {
+    private fun getFormattedDate(): String {
         val date = Date(System.currentTimeMillis())
         val format = SimpleDateFormat("yyyy-MM-dd-HH-mm")
+        return format.format(date)
+    }
 
+
+    private fun getName(task: BackupTask): String {
         val prefix = if(!task.containerPW.isNullOrBlank()) "encrypted_"  else ""
-
-        return "$prefix${task.name}_" + format.format(date) + ".zip"
+        return "$prefix${task.name}_" + getFormattedDate() + ".zip"
     }
 
     fun calculateSize(root: DocumentFile): Long {
@@ -279,5 +282,13 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             folderSize += root.length()
         }
         return folderSize
+    }
+
+    override fun onProgressed() {
+        TODO("Not yet implemented")
+    }
+
+    override fun wasStopped(): Boolean {
+        return this.isStopped
     }
 }
