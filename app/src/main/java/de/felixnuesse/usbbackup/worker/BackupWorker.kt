@@ -1,7 +1,6 @@
 package de.felixnuesse.usbbackup.worker
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -13,7 +12,6 @@ import androidx.work.WorkerParameters
 import de.felixnuesse.crypto.Crypto
 import de.felixnuesse.usbbackup.StorageUtils
 import de.felixnuesse.usbbackup.UriUtils
-import de.felixnuesse.usbbackup.database.AppDatabase
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.fs.FsUtils
@@ -23,26 +21,9 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.UUID
-import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.text.format
 
 class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams), StateCallback {
-
-    private var zipUtils = ZipUtils(mContext, this)
-    private var fsUtils = FsUtils(mContext, this)
-
-    inner class Progress() {
-        var overallSize = 0L
-        var calculatedSize = 0L
-
-        fun getProgress(): Int {
-            val progress = (100L * calculatedSize) / overallSize
-            Log.e("Tag", "progress: ${progress.toInt()} $calculatedSize $overallSize")
-            return progress.toInt()
-        }
-    }
-
 
     companion object {
         fun now(context: Context, storageId: String) {
@@ -70,6 +51,22 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
     }
 
     private var mNotifications = Notifications(mContext, 0)
+    private var mZipUtils = ZipUtils(mContext, this)
+    private var mFsUtils = FsUtils(mContext, this)
+    private var mProgress = Progress()
+
+    inner class Progress() {
+        var overallSize = 0L
+        var calculatedSize = 0L
+        var currentSource = ""
+        var currentPath = ""
+
+        fun getProgress(): Int {
+            val progress = (100L * calculatedSize) / overallSize
+            Log.e("Tag", "progress: ${progress.toInt()} $calculatedSize $overallSize")
+            return progress.toInt()
+        }
+    }
 
     override fun doWork(): Result {
 
@@ -129,7 +126,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         mNotifications.showNotification("Backing up ${backupTask.name}...", "Zipping...", true)
 
         val targetFolder = try {
-            DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())?.createDirectory("date_${getFormattedDate()}")!!
+            DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())?.createDirectory("USBBackup_${getFormattedDate()}")!!
         } catch (e: Exception) {
             mNotifications.showNotification("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
             return false
@@ -138,25 +135,18 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         val unencryptedCacheFile = File(mContext.cacheDir, "cache.zip")
         unencryptedCacheFile.createNewFile()
 
-        val progress = Progress()
+        mProgress = Progress()
         try {
             backupTask.sources.forEach {
-                progress.overallSize += calculateSize(DocumentFile.fromTreeUri(mContext, it.uri.toUri())!!)
+                mProgress.overallSize += mFsUtils.calculateSize(DocumentFile.fromTreeUri(mContext, it.uri.toUri())!!)
             }
-
-            // todo: maybe use following scheme:
-            //      ./date/encrypted.zip
-            //      ./date/decryptedA
-            //      ./date/decryptedB
-            //      ./readme,etc
-
-            // todo: create the date folder in the cache dir, and then move that after everything else.
-            // That way, we dont leave half a backup if something breaks!
 
             ZipOutputStream(FileOutputStream(unencryptedCacheFile)).use {
                 backupTask.sources.forEach { source ->
 
                     val sourceUri = source.uri.toUri()
+                    mProgress.currentSource = UriUtils.getName(mContext, sourceUri)
+
                     val sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
                     if(sourceDocument?.canRead() != true) {
                         mNotifications.showError("Error: Could not backup!", "There was an error backing up ${backupTask.name}. We could not read the source folder!")
@@ -164,13 +154,12 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     }
 
                     if(UriUtils.isFolder(mContext, sourceUri)) {
-                        val namedPath = UriUtils.getName(mContext, sourceUri)
                         if(source.encrypt) {
-                            zipUtils.addToZipRecursive(sourceDocument, it, "$namedPath/", progress)
+                            mZipUtils.addToZipRecursive(sourceDocument, it, "${mProgress.currentSource}/", mProgress)
                         } else {
                             mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing Folder...", true, false)
                             Log.e("Tag", "Storing folder...")
-                            fsUtils.copyFolder(sourceDocument, targetFolder.createDirectory(namedPath)!!)
+                            mFsUtils.copyFolder(sourceDocument, targetFolder.createDirectory(mProgress.currentSource)!!)
                         }
                     } else {
                         //todo: files????
@@ -224,7 +213,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
         Log.e("Tag", "Decrypting...")
         val decrypted = mContext.contentResolver.openInputStream(encryptedZipUri)!!
-        val target = File(mContext.externalCacheDir, "de_"+getName(backupTask))
+        val target = File(mContext.externalCacheDir, "de_" + getFormattedDate() + ".zip")
 
         Log.e("Tag", "Decrypting: ${target.absolutePath}")
         Crypto().aesDecrypt(decrypted, target.outputStream(), password)
@@ -236,12 +225,10 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         val decryptReadmePath = mContext.assets.list("")?.firstOrNull { it.startsWith("README") }
 
         Log.e("Tag", "Update decrypt-tool...")
-        writeSingleFile(decryptToolPath, targetFolder, backupTask.name, "Updating tool...", false)
+        writeSingleFile(decryptToolPath, targetFolder.parentFile!!, backupTask.name, "Updating tool...", false)
         Log.e("Tag", "Update decrypt-readme...")
-        writeSingleFile(decryptReadmePath, targetFolder, backupTask.name, "Updating readme...", true)
+        writeSingleFile(decryptReadmePath, targetFolder.parentFile!!, backupTask.name, "Updating readme...", true)
     }
-
-
 
     fun writeSingleFile(path: String?, targetFolder: DocumentFile, taskname: String, task: String, replace: Boolean) {
         path?.let { fileName ->
@@ -262,30 +249,13 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     private fun getFormattedDate(): String {
         val date = Date(System.currentTimeMillis())
-        val format = SimpleDateFormat("yyyy-MM-dd-HH-mm")
+        val format = SimpleDateFormat("yyyy-MM-dd_HH-mm")
         return format.format(date)
     }
 
-
-    private fun getName(task: BackupTask): String {
-        val prefix = if(!task.containerPW.isNullOrBlank()) "encrypted_"  else ""
-        return "$prefix${task.name}_" + getFormattedDate() + ".zip"
-    }
-
-    fun calculateSize(root: DocumentFile): Long {
-        var folderSize = 0L
-        if (root.isDirectory) {
-            root.listFiles().forEach {
-                folderSize += calculateSize(it)
-            }
-        } else {
-            folderSize += root.length()
-        }
-        return folderSize
-    }
-
-    override fun onProgressed() {
-        TODO("Not yet implemented")
+    override fun onProgressed(message: String) {
+        mNotifications.showNotification("Backing up ${mProgress.currentSource}...", message, true, false, mProgress.getProgress())
+        Log.e("TAG", "Backing up ${mProgress.currentSource}... || $message || ${mProgress.getProgress()}")
     }
 
     override fun wasStopped(): Boolean {

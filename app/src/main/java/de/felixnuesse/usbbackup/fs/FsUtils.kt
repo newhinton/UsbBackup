@@ -1,6 +1,7 @@
 package de.felixnuesse.usbbackup.fs
 
 import android.content.Context
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import de.felixnuesse.usbbackup.worker.StateCallback
 
@@ -9,6 +10,10 @@ class FsUtils(private var mContext: Context, private var mCallback: StateCallbac
 
     fun copyFolder(sourceFile: DocumentFile, target: DocumentFile) {
         sourceFile.listFiles().forEach { it ->
+
+            mCallback.onProgressed("Copy...")
+            Log.e("Tag", "Processing: $${it.uri}")
+
             if(it.isFile) {
                 writeFile(it, target.createFile("", it.name ?: "New File")!!, false)
             }
@@ -30,5 +35,17 @@ class FsUtils(private var mContext: Context, private var mCallback: StateCallbac
                     outputStream.flush()
                 }
             }
+    }
+
+    fun calculateSize(root: DocumentFile): Long {
+        var folderSize = 0L
+        if (root.isDirectory) {
+            root.listFiles().forEach {
+                folderSize += calculateSize(it)
+            }
+        } else {
+            folderSize += root.length()
+        }
+        return folderSize
     }
 }

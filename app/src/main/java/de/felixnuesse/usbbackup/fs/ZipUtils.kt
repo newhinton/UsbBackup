@@ -2,6 +2,7 @@ package de.felixnuesse.usbbackup.fs
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import de.felixnuesse.usbbackup.worker.BackupWorker.Progress
 import de.felixnuesse.usbbackup.worker.StateCallback
@@ -16,8 +17,9 @@ class ZipUtils(private var mContext: Context, private var mCallback: StateCallba
         if(mCallback.wasStopped()) return
 
         current.listFiles().forEach {
-             // mNotifications.showNotification("Backing up ${it.name}...", "Zipping...", true, false, progress.getProgress())
-            //Log.e("Tag", "Processing: $path${it.name}")
+
+            mCallback.onProgressed("Zipping...")
+            Log.e("Tag", "Processing: $path${it.name}")
             if(it.isDirectory) {
                 val entry = ZipEntry("$path${it.name}/")
                 zip.putNextEntry(entry)
