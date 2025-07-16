@@ -17,7 +17,6 @@ import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
-import de.felixnuesse.usbbackup.dialog.InputDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,26 +92,21 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
     override fun click(task: BackupTask, menuItemId: Int): Boolean {
         return when(menuItemId) {
+            R.id.taskMenuItemCopy -> {
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        val newId = mBackupTaskMiddleware.copy(task.id!!)
+                        AddActivity.startEdit(newId, this@MainActivity)
+                    }
+                }
+                true
+            }
             R.id.taskMenuItemEdit -> {
                 AddActivity.startEdit(task.id!!, this@MainActivity)
                 true
             }
             R.id.taskMenuItemDelete -> {
                 ConfirmDialog(this@MainActivity, this@MainActivity).showDialog(task.id!!, task.name)
-                true
-            }
-            R.id.taskMenuItemSetPassword -> {
-                InputDialog(this@MainActivity, this@MainActivity).showDialog(task.id!!)
-                true
-            }
-            R.id.taskMenuItemDeletePassword -> {
-                lifecycleScope.launch {
-                    withContext(Dispatchers.IO) {
-                        task.containerPW = null
-                        mBackupTaskMiddleware.update(task)
-                        updateList()
-                    }
-                }
                 true
             }
             R.id.taskMenuItemEnable -> {

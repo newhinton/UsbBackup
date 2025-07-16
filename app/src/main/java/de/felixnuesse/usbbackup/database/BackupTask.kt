@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class BackupTask (
     @PrimaryKey var id: Int? = null,
-    @ColumnInfo(name = "name") val name: String,
+    @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "targetUri") val targetUri: String,
     @ColumnInfo(name = "containerPW") var containerPW: String?,
     @ColumnInfo(name = "enabled") var enabled: Boolean

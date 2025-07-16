@@ -30,17 +30,28 @@ class BackupTaskMiddleware(private var backupDao: BackupTaskDao, private var sou
         entry.forEach(::insert)
     }
 
-    fun insert(entry: BackupTask) {
-        val id = entry.id ?: backupDao.insert(entry).toInt()
-        storeSources(entry.sources, id)
+    fun copy(id: Int): Int {
+        val entry = get(id)
+        entry.id = null
+        entry.name += " (Copy)"
+        entry.sources.forEach {
+            it.parentId = -1
+        }
+        return insert(entry)
     }
 
-    fun update(entry: BackupTask){
+    fun insert(entry: BackupTask): Int {
+        val id = entry.id ?: backupDao.insert(entry).toInt()
+        storeSources(entry.sources, id)
+        return id
+    }
+
+    fun update(entry: BackupTask) {
         backupDao.update(entry)
         updateSources(entry.sources, entry.id!!)
     }
 
-    fun delete(entry: BackupTask){
+    fun delete(entry: BackupTask) {
         backupDao.delete(entry)
         entry.id?.let { sourceDao.deleteByParentId(it) }
     }

@@ -2,20 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/taskMenuItemCopy"
+        android:title="Duplicate" />
+    <item
         android:id="@+id/taskMenuItemEdit"
         android:title="Edit" />
     <item
         android:id="@+id/taskMenuItemDelete"
         android:icon="@drawable/icon_delete"
         android:title="Delete" />
-    <item
-        android:id="@+id/taskMenuItemDeletePassword"
-        android:icon="@drawable/icon_delete"
-        android:title="Remove Password" />
-    <item
-        android:id="@+id/taskMenuItemSetPassword"
-        android:icon="@drawable/icon_delete"
-        android:title="Set Password" />
     <item
         android:id="@+id/taskMenuItemDisable"
         android:title="Disable" />

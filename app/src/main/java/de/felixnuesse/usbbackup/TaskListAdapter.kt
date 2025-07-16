@@ -44,7 +44,6 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 binding.noPasswordImageView.visibility = View.INVISIBLE
                 binding.passwordImageView.visibility = View.VISIBLE
             } else {
-                menu.menu.findItem(R.id.taskMenuItemDeletePassword).isVisible = false
                 binding.noPasswordImageView.visibility = View.VISIBLE
                 binding.passwordImageView.visibility = View.INVISIBLE
             }
