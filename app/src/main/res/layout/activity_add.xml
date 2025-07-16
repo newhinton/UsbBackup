@@ -51,7 +51,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:singleLine="true"
-                android:text="@string/select_a_source_folder"
+                android:text="@string/source_folder"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFileButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -61,7 +61,7 @@
                 android:id="@+id/sourceList"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
+                app:layout_constraintEnd_toEndOf="@+id/sourceUriFolderButton"
                 app:layout_constraintStart_toStartOf="@+id/sourceUri"
                 app:layout_constraintTop_toBottomOf="@+id/sourceUriFolderButton" />
 
@@ -103,13 +103,13 @@
                 app:tint="?attr/colorPrimary" />
 
             <TextView
-                android:id="@+id/targetUri"
+                android:id="@+id/targetLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="8dp"
                 android:singleLine="true"
-                android:text="@string/select_a_targetfolder"
+                android:text="@string/target_folder"
                 app:layout_constraintEnd_toStartOf="@+id/targetUriFolderButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageView" />
@@ -134,7 +134,7 @@
                 app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/targetUri" />
+                app:layout_constraintTop_toTopOf="@+id/targetLabel" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -184,7 +184,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
+            android:text="@string/warning_no_password_set"
             android:textColor="#D00000" />
     </LinearLayout>
 
@@ -197,7 +197,7 @@
         android:layout_marginEnd="32dp"
         android:clickable="false"
         android:enabled="true"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/layoutNoPassword"
         app:srcCompat="@drawable/icon_save" />

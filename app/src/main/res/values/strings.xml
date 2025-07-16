@@ -22,10 +22,11 @@
     <string name="intro_slide_done_title">Done!</string>
     <string name="intro_slide_done_description">You are now ready to start! You can now configure your backups!</string>
     <string name="about">About</string>
-    <string name="select_a_source_folder">Select a source folder!</string>
-    <string name="select_a_targetfolder">Select a targetfolder!</string>
+    <string name="source_folder">Source Folder:</string>
+    <string name="target_folder">Target Folder:</string>
     <string name="title_of_the_task">Title of the Task</string>
-    <string name="warning_no_password_set_backup_will_be_unencrypted">Warning! No password set. Backup will be unencrypted!</string>
+    <string name="warning_no_password_set">No password set. Please enter a password!</string>
     <string name="password">Password</string>
+    <string name="delete_button_for_source_item">Delete Button for Source Item</string>
 
 </resources>

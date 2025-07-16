@@ -17,15 +17,12 @@ class SourceListAdapter(private val sources: List<Source>, private val mContext:
 
             binding.source.isChecked = source.encrypt
 
-
-
-
             binding.deleteButton.setOnClickListener {
                 callbacks.delete(source.uri)
             }
 
             binding.source.setOnCheckedChangeListener { view, isChecked ->
-                callbacks.encrypted(source.uri, isChecked)
+                callbacks.setEncrypted(source.uri, isChecked)
             }
         }
     }

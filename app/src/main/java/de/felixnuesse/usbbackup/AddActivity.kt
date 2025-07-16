@@ -4,27 +4,23 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.DocumentsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageId
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.database.Source
 import de.felixnuesse.usbbackup.databinding.ActivityAddBinding
+import de.felixnuesse.usbbackup.extension.visible
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,8 +34,8 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
         private const val SOURCE_LAST_URI = "SOURCE_LAST_URI"
         private const val INTENT_EXTRA_ID = "INTENT_EXTRA_ID"
 
-        public fun startEdit(id: Int, context: Context) {
-            var editIntent = Intent(context, AddActivity::class.java)
+        fun startEdit(id: Int, context: Context) {
+            val editIntent = Intent(context, AddActivity::class.java)
             editIntent.putExtra(INTENT_EXTRA_ID, id)
             context.startActivity(editIntent)
         }
@@ -116,10 +112,8 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
                 mSourceList = existing.sources
                 runOnUiThread {
                     binding.nameTextfield.setText(existing.name)
-                    //mSourceUri = existing.sourceUri.toUri()
                     mTargetUri = existing.targetUri.toUri()
                     binding.pwTextfield.setText(existing.containerPW)
-
                     updateUi()
                 }
             }
@@ -143,25 +137,34 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
     }
 
     private fun updateUi() {
-        if (!mSourceList.isEmpty() && mTargetUri != null && !binding.nameTextfield.text.toString().isBlank()) {
-            binding.saveFab.visibility = View.VISIBLE
-        } else {
-            binding.saveFab.visibility = View.INVISIBLE
+
+
+        // states
+        val hasSourceEntries = mSourceList.isNotEmpty()
+        val hasEncryptedSourceEntries = mSourceList.filter { it.encrypt }.toList().isNotEmpty()
+        val passwordSet = binding.pwTextfield.text.toString().isNotBlank()
+
+        val hasName = binding.nameTextfield.text.toString().isNotBlank()
+        val hasTarget = mTargetUri != null
+
+        // visibility
+
+        val baseConditions = hasSourceEntries && hasTarget && hasName
+        // encrypted items and password, or no encrypted items are fine
+        val encryptionConditions = (hasEncryptedSourceEntries && passwordSet) || !hasEncryptedSourceEntries
+        binding.saveFab.isEnabled = baseConditions && encryptionConditions
+
+        binding.pwInput.visible(hasEncryptedSourceEntries)
+        binding.layoutNoPassword.visible(!passwordSet && hasEncryptedSourceEntries)
+
+        // data
+        if(hasTarget) {
+            binding.targetUriMetadata.text = getUriMetadata(this, mTargetUri)
         }
 
         binding.sourceList.layoutManager = LinearLayoutManager(this)
         binding.sourceList.adapter = SourceListAdapter(mSourceList, this, this)
 
-        if(mTargetUri!=null) {
-            binding.targetUri.text = mTargetUri.toString()
-            binding.targetUriMetadata.text = getUriMetadata(this, mTargetUri)
-        }
-
-        binding.layoutNoPassword.visibility = if (binding.pwTextfield.text.toString().isBlank()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
@@ -198,18 +201,16 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
     }
 
     override fun delete(uri: String) {
-        System.err.println("DELETE: $uri ${mSourceList.size}")
         mSourceList.removeIf { it.uri == uri }
         updateUi()
-
-        System.err.println("DELETE: $uri ${mSourceList.size}")
     }
 
-    override fun encrypted(uri: String, isEncrypted: Boolean) {
+    override fun setEncrypted(uri: String, encrypt: Boolean) {
         mSourceList.forEach {
             if(it.uri == uri) {
-                it.encrypt = isEncrypted
+                it.encrypt = encrypt
             }
         }
+        updateUi()
     }
 }
