@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
 
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.biometric)
 
     implementation(project(":crypto"))
 }

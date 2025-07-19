@@ -18,6 +18,7 @@ jetbrainsKotlinJvm = "2.0.21"
 recyclerview = "1.4.0"
 
 [libraries]
+androidx-biometric = { module = "androidx.biometric:biometric", version = "1.1.0" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 appintro = { module = "com.github.AppIntro:AppIntro", version.ref = "appintro" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }

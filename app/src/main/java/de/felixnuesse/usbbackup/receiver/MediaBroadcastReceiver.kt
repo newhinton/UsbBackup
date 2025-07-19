@@ -19,14 +19,8 @@ class MediaBroadcastReceiver: BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.e("TAG", "Recieved Broadcast!")
 
-
-        context.contentResolver.persistedUriPermissions.forEach {
-            Log.e("TAG", "PP ${it.uri} ${it.toString()}")
-        }
-
-
-        var storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
-        var preMountVolumes = storageManager.storageVolumes
+        val storageManager = context.getSystemService(Context.STORAGE_SERVICE) as StorageManager
+        val preMountVolumes = storageManager.storageVolumes
 
 
 

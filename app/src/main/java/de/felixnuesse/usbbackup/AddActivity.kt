@@ -15,7 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
+import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.database.Source
@@ -159,7 +159,7 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
 
         // data
         if(hasTarget) {
-            binding.targetUriMetadata.text = getUriMetadata(this, mTargetUri)
+            binding.targetUriMetadata.text = getStorageLabel(this, mTargetUri!!) + ": "+mTargetUri!!.path?.split(":")[1]
         }
 
         binding.sourceList.layoutManager = LinearLayoutManager(this)

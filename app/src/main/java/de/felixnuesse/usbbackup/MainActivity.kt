@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
     override fun setText(text: String, id: Int) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                var task = mBackupTaskMiddleware.get(id)
+                val task = mBackupTaskMiddleware.get(id)
                 task.containerPW = text
                 mBackupTaskMiddleware.update(task)
                 updateList()

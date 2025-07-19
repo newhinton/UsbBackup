@@ -9,6 +9,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
@@ -27,7 +28,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
 
             val targetUri = task.targetUri.toUri()
-            val targetUriName = UriUtils.getStorageId(targetUri)
+            val targetUriName = getStorageLabel(mContext, targetUri) + ": "+targetUri.path?.split(":")[1]
 
             binding.source.text = task.sources.joinToString("\n") { getUriMetadata(mContext, it.uri.toUri())}
             binding.target.text = targetUriName
