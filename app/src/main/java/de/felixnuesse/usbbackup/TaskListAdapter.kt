@@ -2,6 +2,7 @@ package de.felixnuesse.usbbackup
 
 import android.content.Context
 import android.graphics.Paint
+import android.icu.text.RelativeDateTimeFormatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,10 @@ import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
+import de.felixnuesse.usbbackup.utils.DateFormatter
 import de.felixnuesse.usbbackup.worker.BackupWorker
+import java.time.Duration
+import java.time.Instant
 
 
 class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context, private val mPopupCallback: PopupCallback) : RecyclerView.Adapter<TaskListAdapter.Row>() {
@@ -33,12 +37,19 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
             binding.source.text = task.sources.joinToString("\n") { getUriMetadata(mContext, it.uri.toUri())}
             binding.target.text = targetUriName
 
-            var menu = getPopupMenu(binding.moreButton, task)
-
+            val menu = getPopupMenu(binding.moreButton, task)
             binding.moreButton.setOnClickListener {
                 menu.show()
             }
 
+            if(task.lastSuccessfulBackup != BackupTask.NEVER) {
+
+                val now = Instant.now()
+                val then = Instant.ofEpochMilli(task.lastSuccessfulBackup)
+                val duration = Duration.between(now, then)
+
+                binding.lastSuccessfulRun.text = DateFormatter.relative(duration.toDays()).capitalize()
+            }
 
             if(!task.containerPW.isNullOrBlank()) {
                 binding.noPasswordTextView.visibility = View.GONE
