@@ -18,6 +18,7 @@ import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
+import de.felixnuesse.usbbackup.worker.NotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
