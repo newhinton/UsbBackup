@@ -61,6 +61,12 @@ class BackupTaskMiddleware(private var backupDao: BackupTaskDao, private var sou
         sourceDao.deleteByParentId(id)
     }
 
+    fun updateSuccessTimestamp(id: Int) {
+        val entry = get(id)
+        entry.lastSuccessfulBackup = System.currentTimeMillis()
+        update(entry)
+    }
+
     private fun loadSources(task: BackupTask) {
         if(task.id != null) {
             task.sources = ArrayList(sourceDao.getByParent(task.id!!))
@@ -75,6 +81,7 @@ class BackupTaskMiddleware(private var backupDao: BackupTaskDao, private var sou
             sourceDao.insert(it)
         }
     }
+
     private fun updateSources(sources: ArrayList<Source>, parentId: Int) {
         sourceDao.deleteByParentId(parentId)
         storeSources(sources, parentId)
