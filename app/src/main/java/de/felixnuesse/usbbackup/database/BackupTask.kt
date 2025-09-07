@@ -12,10 +12,14 @@ data class BackupTask (
     @ColumnInfo(name = "targetUri") val targetUri: String,
     @ColumnInfo(name = "containerPW") var containerPW: String?,
     @ColumnInfo(name = "enabled") var enabled: Boolean,
-    @ColumnInfo(name = "lastSuccessfulBackup") var lastSuccessfulBackup: Long
+    @ColumnInfo(name = "lastSuccessfulBackup") var lastSuccessfulBackup: Long? = NEVER
 ) {
 
     @Ignore var sources: ArrayList<Source> = arrayListOf()
+
+    @Ignore fun getLastSuccessfulBackup(): Long {
+        return lastSuccessfulBackup?: NEVER
+    }
 
     companion object {
         const val NEVER = -1L

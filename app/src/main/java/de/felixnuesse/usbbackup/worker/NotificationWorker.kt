@@ -71,7 +71,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
         val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
         backupTaskMiddleware.getAll().forEach {
             val hasRunBefore = it.lastSuccessfulBackup != NEVER
-            val daysDifference = DateFormatter.daysDifference(it.lastSuccessfulBackup)
+            val daysDifference = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
             val wasntToday = daysDifference != 0L
             val wasThreeMonthAgo = (daysDifference % 90 == 0L)
             if( hasRunBefore && wasntToday && wasThreeMonthAgo) {
