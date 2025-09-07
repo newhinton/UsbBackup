@@ -6,11 +6,10 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.felixnuesse.usbbackup.R
+import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.ACTION_STOP
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.EXTRA_UUID
@@ -25,8 +24,10 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     companion object {
         private val NOTIFICATION_CHANNEL_ID = "backup_worker_notifications"
         private val NOTIFICATION_CHANNEL_ERROR_ID = "backup_worker_error_notifications"
+        private val NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID = "outdated_worker_notifications"
         private val NOTIFICATION_ID = 5691
         private val NOTIFICATION_ERROR_ID = 15691
+        private val NOTIFICATION_BACKUP_OUTDATED_ID = 14658
     }
 
     var mUuid: UUID? = null
@@ -80,6 +81,22 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     }
 
 
+    fun notifyOutdatedBackup(task: BackupTask) {
+
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+
+        createOutdatedNotificationChannel()
+
+        val mBuilder = NotificationCompat.Builder(mContext)
+            .setChannelId(NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID)
+            .setSmallIcon(R.drawable.icon_security_key)
+            .setContentTitle("Backup '${task.name}' outdated!")
+            .setContentText("Please insert the appropriate media soon!")
+
+        mNotificationManager.notify(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt(), mBuilder.build())
+    }
+
+
     private fun getStopIntent(): PendingIntent {
         val stopIntent = Intent(mContext, NotificationReceiver::class.java)
         stopIntent.setAction(ACTION_STOP)
@@ -109,6 +126,16 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             NOTIFICATION_CHANNEL_ERROR_ID,
             "Backup Worker Error Channel",
             NotificationManager.IMPORTANCE_DEFAULT
+        )
+        mNotificationManager.createNotificationChannel(channel)
+    }
+
+
+    private fun createOutdatedNotificationChannel() {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID,
+            "Outdated Backup Channel",
+            NotificationManager.IMPORTANCE_HIGH
         )
         mNotificationManager.createNotificationChannel(channel)
     }

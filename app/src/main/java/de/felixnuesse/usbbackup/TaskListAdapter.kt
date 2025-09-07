@@ -43,12 +43,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
             }
 
             if(task.lastSuccessfulBackup != BackupTask.NEVER) {
-
-                val now = Instant.now()
-                val then = Instant.ofEpochMilli(task.lastSuccessfulBackup)
-                val duration = Duration.between(now, then)
-
-                binding.lastSuccessfulRun.text = DateFormatter.relative(duration.toDays()).capitalize()
+                binding.lastSuccessfulRun.text = DateFormatter.relative(task.lastSuccessfulBackup).capitalize()
             }
 
             if(!task.containerPW.isNullOrBlank()) {

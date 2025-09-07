@@ -68,6 +68,8 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
         mBackupTaskMiddleware = BackupTaskMiddleware.get(this)
         updateList()
+
+        NotificationWorker.schedule(this)
     }
 
     override fun onResume() {

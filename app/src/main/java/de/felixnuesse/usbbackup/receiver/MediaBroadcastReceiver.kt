@@ -53,7 +53,7 @@ class MediaBroadcastReceiver: BroadcastReceiver() {
                     tryFindingNewVolume(context, delay, storageManager, preMountVolumes, iterationsLeft - 1)
                 }
             } else {
-                BackupWorker.Companion.now(context, newDrive.uuid.toString())
+                BackupWorker.now(context, newDrive.uuid.toString())
             }
         }, delay)
 
