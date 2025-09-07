@@ -100,8 +100,8 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             if(it.enabled){
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
                 finalMessage += if(processTask(it)) {
-                    "${it.name} was sucessfully backed up.\n"
                     it.id?.let { it1 -> backupTaskMiddleware.updateSuccessTimestamp(it1) }
+                    "${it.name} was sucessfully backed up.\n"
                 } else {
                     "Warning: ${it.name} was NOT backed up!\n"
                 }
