@@ -13,6 +13,7 @@ import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.ACTION_STOP
 import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.EXTRA_UUID
+import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.UUID
 
 
@@ -87,11 +88,12 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
         createOutdatedNotificationChannel()
 
+        val relative = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID)
             .setSmallIcon(R.drawable.icon_security_key)
             .setContentTitle("Backup '${task.name}' outdated!")
-            .setContentText("Please insert the appropriate media soon!")
+            .setContentText("Last Backup: $relative\nPlease insert the appropriate media soon!")
 
         mNotificationManager.notify(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt(), mBuilder.build())
     }
