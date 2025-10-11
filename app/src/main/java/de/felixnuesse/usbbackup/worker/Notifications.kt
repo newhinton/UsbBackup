@@ -38,14 +38,29 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         showNotification(mId, title, message, ongoing, cancellable, progress)
     }
 
-    fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
+
+    fun showNotificationSuccess(title: String, message: String,) {
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+        createNotificationChannel()
+
+        val mBuilder = NotificationCompat.Builder(mContext)
+            .setChannelId(NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon_usb_success)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+
+        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build())
+    }
+
+    fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1, icon: Int = R.drawable.icon_security_key) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
         createNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_security_key)
+            .setSmallIcon(icon)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
@@ -65,19 +80,19 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     }
 
 
-    fun showError(title: String, message: String) {
+    fun showError(title: String, message: String, overrideId: Int = 0) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
         createErrorNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
-            .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_close)
+            .setChannelId(NOTIFICATION_CHANNEL_ERROR_ID)
+            .setSmallIcon(R.drawable.icon_usb_error)
             .setContentTitle(title)
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
 
-        mNotificationManager.notify(NOTIFICATION_ERROR_ID+mId, mBuilder.build())
+        mNotificationManager.notify(NOTIFICATION_ERROR_ID+mId+overrideId, mBuilder.build())
     }
 
     fun notifyOutdatedBackup(task: BackupTask) {
@@ -88,7 +103,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         val relative = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID)
-            .setSmallIcon(R.drawable.icon_security_key)
+            .setSmallIcon(R.drawable.icon_usb_error)
             .setContentTitle("Backup '${task.name}' outdated!")
             .setContentText("Last Backup: $relative\nPlease insert the appropriate media soon!")
 

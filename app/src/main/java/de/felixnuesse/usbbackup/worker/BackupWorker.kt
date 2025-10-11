@@ -129,7 +129,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         val targetFolder = try {
             DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())?.createDirectory("USBBackup_${getFormattedDate()}")!!
         } catch (e: Exception) {
-            mNotifications.showNotification("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
+            mNotifications.showError("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
             return false
         }
 
@@ -192,12 +192,12 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             unencryptedCacheFile.delete()
 
             Log.e("Tag", "Done!")
-            mNotifications.showNotification("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
+            mNotifications.showNotificationSuccess("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
             return true
         } catch (e: Exception) {
+            mNotifications.showError("Backup Failure!", "Task: ${backupTask.name}, error: ${e.message}", backupTask.id!!)
             Log.e("Tag", "Error: ${e.message}")
             e.printStackTrace()
-            mNotifications.showNotification(backupTask.id!!, "Backup Failure!", "Task: ${backupTask.name}, error: ${e.message}")
         }
         return false
     }
