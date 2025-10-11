@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> <!-- for android 10 and less -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- for android 10 and less -->
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -28,6 +30,20 @@
         </activity>
 
         <activity
+            android:name=".FakeActivity"
+            android:theme="@style/Theme.Transparent"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
+                android:resource="@xml/device_filter" />
+        </activity>
+
+
+
+        <activity
             android:name=".AddActivity"
             android:exported="true">
         </activity>
@@ -40,10 +56,11 @@
             android:exported="false" />
 
         <receiver
-            android:name=".receiver.NotificationReceiver"
+            android:name=".mediascanning.NotificationReceiver"
             android:exported="true">
         </receiver>
 
+        <!--
         <receiver
             android:name=".receiver.MediaBroadcastReceiver"
             android:exported="true">
@@ -55,16 +72,16 @@
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
         </receiver>
+        -->
 
-        <!--
-        <receiver android:name=".MediaBroadcastReceiver" android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_MOUNTED" />
-                <data android:scheme="file"/>
-            </intent-filter>
-        </receiver>
--->
+
+        <service
+            android:name=".mediascanning.MediaScanService"
+            android:foregroundServiceType="shortService"
+            android:exported="false">
+        </service>
+
+
     </application>
 
 </manifest>

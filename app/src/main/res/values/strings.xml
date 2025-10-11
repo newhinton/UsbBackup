@@ -28,5 +28,6 @@
     <string name="warning_no_password_set">No password set. Please enter a password!</string>
     <string name="password">Password</string>
     <string name="delete_button_for_source_item">Delete Button for Source Item</string>
+    <string name="starting_scan_service">Starting scan service…</string>
 
 </resources>

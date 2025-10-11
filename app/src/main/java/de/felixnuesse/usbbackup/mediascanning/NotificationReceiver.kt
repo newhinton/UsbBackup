@@ -1,4 +1,4 @@
-package de.felixnuesse.usbbackup.receiver
+package de.felixnuesse.usbbackup.mediascanning
 
 import android.content.BroadcastReceiver
 import android.content.Context

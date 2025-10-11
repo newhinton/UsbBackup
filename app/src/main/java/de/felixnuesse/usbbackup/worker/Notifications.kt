@@ -10,9 +10,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.felixnuesse.usbbackup.R
 import de.felixnuesse.usbbackup.database.BackupTask
-import de.felixnuesse.usbbackup.receiver.NotificationReceiver
-import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.ACTION_STOP
-import de.felixnuesse.usbbackup.receiver.NotificationReceiver.Companion.EXTRA_UUID
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.ACTION_STOP
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_UUID
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.UUID
 
@@ -26,6 +26,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         private val NOTIFICATION_CHANNEL_ID = "backup_worker_notifications"
         private val NOTIFICATION_CHANNEL_ERROR_ID = "backup_worker_error_notifications"
         private val NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID = "outdated_worker_notifications"
+        private val NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID = "NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID"
         private val NOTIFICATION_ID = 5691
         private val NOTIFICATION_ERROR_ID = 15691
         private val NOTIFICATION_BACKUP_OUTDATED_ID = 14658
@@ -40,7 +41,6 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
-
         createNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
@@ -68,7 +68,6 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     fun showError(title: String, message: String) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
-
         createErrorNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
@@ -81,11 +80,9 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         mNotificationManager.notify(NOTIFICATION_ERROR_ID+mId, mBuilder.build())
     }
 
-
     fun notifyOutdatedBackup(task: BackupTask) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
-
         createOutdatedNotificationChannel()
 
         val relative = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
@@ -96,6 +93,22 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             .setContentText("Last Backup: $relative\nPlease insert the appropriate media soon!")
 
         mNotificationManager.notify(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt(), mBuilder.build())
+    }
+
+
+    fun getForegroundScanNotification(): NotificationCompat.Builder {
+
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+        createForegroundScaneNotificationChannel()
+
+        val mBuilder = NotificationCompat.Builder(mContext)
+            .setChannelId(NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID)
+            .setSmallIcon(R.drawable.icon_security_key)
+            .setContentTitle("Scanning newly attached storage...")
+            .setContentText("We will start a backup when we find appropriate storage media!")
+            .setOngoing(true)
+
+        return mBuilder
     }
 
 
@@ -110,7 +123,6 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     fun dismiss() {
         mNotificationManager.cancel(NOTIFICATION_ID+mId)
     }
-
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -132,12 +144,20 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         mNotificationManager.createNotificationChannel(channel)
     }
 
-
     private fun createOutdatedNotificationChannel() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID,
             "Outdated Backup Channel",
             NotificationManager.IMPORTANCE_HIGH
+        )
+        mNotificationManager.createNotificationChannel(channel)
+    }
+
+    private fun createForegroundScaneNotificationChannel() {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID,
+            "Foreground Media Scan Channel",
+            NotificationManager.IMPORTANCE_NONE
         )
         mNotificationManager.createNotificationChannel(channel)
     }
