@@ -94,27 +94,15 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         mNotifications = Notifications(mContext, id)
         mNotifications.mUuid = this.id
 
-        var finalMessage = ""
-
         tasks.forEach {
             if(it.enabled){
                 Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
-                finalMessage += if(processTask(it)) {
-                    it.id?.let { it1 -> backupTaskMiddleware.updateSuccessTimestamp(it1) }
-                    "${it.name} was sucessfully backed up.\n"
-                } else {
-                    "Warning: ${it.name} was NOT backed up!\n"
-                }
+                processTask(it)
             }
         }
 
-        if(finalMessage.isNotBlank()) {
-            finalMessage += "\nYou can safely remove the media."
-            mNotifications.showNotification("Backup Done!", finalMessage)
-            return Result.success()
-        }
-
-        return Result.failure()
+        // always return success, because this task does not fail. Individual Parts might, but they notify you.
+        return Result.success()
     }
 
     override fun onStopped() {
@@ -192,6 +180,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             unencryptedCacheFile.delete()
 
             Log.e("Tag", "Done!")
+            mNotifications.dismiss()
             mNotifications.showNotificationSuccess("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
             return true
         } catch (e: Exception) {

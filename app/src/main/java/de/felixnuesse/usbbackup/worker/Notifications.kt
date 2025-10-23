@@ -28,6 +28,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         private val NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID = "outdated_worker_notifications"
         private val NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID = "NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID"
         private val NOTIFICATION_ID = 5691
+        private val NOTIFICATION_SUCCESS_ID = 10593
         private val NOTIFICATION_ERROR_ID = 15691
         private val NOTIFICATION_BACKUP_OUTDATED_ID = 14658
     }
@@ -50,7 +51,11 @@ class Notifications(private var mContext: Context, private var mId: Int) {
             .setContentText(message)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
 
-        mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build())
+        mNotificationManager.notify(NOTIFICATION_SUCCESS_ID, mBuilder.build())
+    }
+
+    fun dismissSuccessNotification() {
+        mNotificationManager.cancel(NOTIFICATION_SUCCESS_ID)
     }
 
     fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1, icon: Int = R.drawable.icon_security_key) {
