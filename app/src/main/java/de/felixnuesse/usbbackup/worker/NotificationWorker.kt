@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit
 class NotificationWorker (private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams) {
 
 
+    private val warningIntervalInDays = 90
 
     companion object {
         private const val DAILY_HOUR_TO_RUN = 19
@@ -62,7 +63,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             workRequest.setInitialDelay(delay, TimeUnit.MILLISECONDS)
             workRequest.build()
 
-            manager.enqueueUniquePeriodicWork("Test Outdated Backups", ExistingPeriodicWorkPolicy.UPDATE, workRequest.build())
+            manager.enqueueUniquePeriodicWork("Test For Outdated Backups", ExistingPeriodicWorkPolicy.UPDATE, workRequest.build())
         }
     }
 
@@ -73,8 +74,8 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             val hasRunBefore = it.lastSuccessfulBackup != NEVER
             val daysDifference = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
             val wasntToday = daysDifference != 0L
-            val wasThreeMonthAgo = (daysDifference % 90 == 0L)
-            if( hasRunBefore && wasntToday && wasThreeMonthAgo) {
+            val wasXDaysAgo = (daysDifference % warningIntervalInDays == 0L)
+            if( hasRunBefore && wasntToday && wasXDaysAgo) {
                 Notifications(mContext, 0).notifyOutdatedBackup(it)
             }
         }

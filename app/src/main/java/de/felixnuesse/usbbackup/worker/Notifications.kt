@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import de.felixnuesse.usbbackup.R
@@ -24,6 +25,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
 
     companion object {
         private val NOTIFICATION_CHANNEL_ID = "backup_worker_notifications"
+        private val NOTIFICATION_CHANNEL_SUCCESS_ID = "backup_worker_success_notifications"
         private val NOTIFICATION_CHANNEL_ERROR_ID = "backup_worker_error_notifications"
         private val NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID = "outdated_worker_notifications"
         private val NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID = "NOTIFICATION_CHANNEL_FOREGROUND_SCAN_ID"
@@ -36,38 +38,16 @@ class Notifications(private var mContext: Context, private var mId: Int) {
     var mUuid: UUID? = null
 
     fun showNotification(title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1) {
-        showNotification(mId, title, message, ongoing, cancellable, progress)
-    }
-
-
-    fun showNotificationSuccess(title: String, message: String,) {
-        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
-        createNotificationChannel()
-
-        val mBuilder = NotificationCompat.Builder(mContext)
-            .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_usb_success)
-            .setContentTitle(title)
-            .setContentText(message)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
-
-        mNotificationManager.notify(NOTIFICATION_SUCCESS_ID, mBuilder.build())
-    }
-
-    fun dismissSuccessNotification() {
-        mNotificationManager.cancel(NOTIFICATION_SUCCESS_ID)
-    }
-
-    fun showNotification(overrideId: Int, title: String, message: String, ongoing: Boolean = false, cancellable: Boolean = true, progress: Int = -1, icon: Int = R.drawable.icon_security_key) {
 
         NotificationManagerCompat.from(mContext).areNotificationsEnabled()
         createNotificationChannel()
 
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(icon)
+            .setSmallIcon(R.drawable.icon_security_key)
             .setContentTitle(title)
             .setContentText(message)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
 
 
@@ -81,7 +61,34 @@ class Notifications(private var mContext: Context, private var mId: Int) {
                 mBuilder.addAction(R.drawable.icon_cancel, "Cancel", null)
             }
         }
-        mNotificationManager.notify(NOTIFICATION_ID+overrideId, mBuilder.build())
+        mNotificationManager.notify(NOTIFICATION_ID+mId, mBuilder.build())
+    }
+
+    fun dismissDefaultNotification() {
+        mNotificationManager.cancel(NOTIFICATION_ID+mId)
+    }
+
+
+    fun showNotificationSuccess(title: String, message: String) {
+        dismissDefaultNotification()
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+        createSuccessNotificationChannel()
+
+        val mBuilder = NotificationCompat.Builder(mContext)
+            .setChannelId(NOTIFICATION_CHANNEL_SUCCESS_ID)
+            .setSmallIcon(R.drawable.icon_usb_success)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setColor(Color.rgb(58, 168, 10))
+            .setColorized(true)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(message))
+
+        mNotificationManager.notify(NOTIFICATION_SUCCESS_ID, mBuilder.build())
+    }
+
+    fun dismissSuccessNotification() {
+        mNotificationManager.cancel(NOTIFICATION_SUCCESS_ID)
     }
 
 
@@ -109,6 +116,8 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID)
             .setSmallIcon(R.drawable.icon_usb_error)
+            .setColor(Color.rgb(242, 115, 22))
+            .setColorized(true)
             .setContentTitle("Backup '${task.name}' outdated!")
             .setContentText("Last Backup: $relative\nPlease insert the appropriate media soon!")
 
@@ -139,16 +148,22 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         return PendingIntent.getBroadcast(mContext, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
-
-    fun dismiss() {
-        mNotificationManager.cancel(NOTIFICATION_ID+mId)
-    }
-
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
             NOTIFICATION_CHANNEL_ID,
             "Backup Worker Channel",
             NotificationManager.IMPORTANCE_LOW
+        )
+
+        channel.setSound(null, null)
+        mNotificationManager.createNotificationChannel(channel)
+    }
+
+    private fun createSuccessNotificationChannel() {
+        val channel = NotificationChannel(
+            NOTIFICATION_CHANNEL_SUCCESS_ID,
+            "Backup Worker Success Channel",
+            NotificationManager.IMPORTANCE_HIGH
         )
 
         channel.setSound(null, null)

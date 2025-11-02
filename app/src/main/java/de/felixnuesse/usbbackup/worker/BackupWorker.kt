@@ -95,9 +95,20 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         mNotifications.mUuid = this.id
 
         tasks.forEach {
-            if(it.enabled){
-                Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
-                processTask(it)
+            if(!it.enabled){
+                return@forEach
+            }
+
+            if(it.id == null) {
+                mNotifications.showError("Error!", "The provided task did not have an ID!")
+                return Result.failure()
+            }
+
+            Log.e("WORKER", "Current Task: ${storageId?: taskId}, ${it.name}")
+
+            val wasSuccessful = processTask(it)
+            if(wasSuccessful) {
+                backupTaskMiddleware.updateSuccessTimestamp(it.id!!)
             }
         }
 
@@ -156,7 +167,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
                     if(this.isStopped) {
                         unencryptedCacheFile.delete()
-                        mNotifications.dismiss()
+                        mNotifications.dismissDefaultNotification()
                         return false
                     }
                 }
@@ -180,7 +191,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             unencryptedCacheFile.delete()
 
             Log.e("Tag", "Done!")
-            mNotifications.dismiss()
+            mNotifications.dismissDefaultNotification()
             mNotifications.showNotificationSuccess("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
             return true
         } catch (e: Exception) {
