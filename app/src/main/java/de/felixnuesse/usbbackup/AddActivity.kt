@@ -73,6 +73,7 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
 
         binding.nameTextfield.addTextChangedListener(getUpdateableTextWatcher())
         binding.pwTextfield.addTextChangedListener(getUpdateableTextWatcher())
+        binding.warningTimeoutTextfield.addTextChangedListener(getUpdateableTextWatcher())
 
 
         binding.saveFab.setOnClickListener {
@@ -87,6 +88,12 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
 
                     if (binding.pwTextfield.text.toString().isNotBlank()) {
                         backup.containerPW = binding.pwTextfield.text.toString()
+                    }
+
+
+                    val warningNumber = binding.warningTimeoutTextfield.text.toString()
+                    if (warningNumber.isNotBlank()) {
+                        backup.warningTimeout = warningNumber.toLongOrNull() ?: BackupTask.WARNING_DISABLED
                     }
 
                     if(mExistingId == -1) {

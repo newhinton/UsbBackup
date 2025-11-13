@@ -29,5 +29,6 @@
     <string name="password">Password</string>
     <string name="delete_button_for_source_item">Delete Button for Source Item</string>
     <string name="starting_scan_service">Starting scan service…</string>
+    <string name="warningTimeout">Warning Timeout (0 to disable)</string>
 
 </resources>

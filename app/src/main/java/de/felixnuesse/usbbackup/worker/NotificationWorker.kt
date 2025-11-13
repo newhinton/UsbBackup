@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
+import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.Calendar
@@ -17,8 +18,6 @@ import java.util.concurrent.TimeUnit
 
 class NotificationWorker (private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams) {
 
-
-    private val warningIntervalInDays = 90
 
     companion object {
         private const val DAILY_HOUR_TO_RUN = 19
@@ -35,10 +34,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             val manager = WorkManager.getInstance(context)
             manager.cancelAllWork()
 
-
-
             val repeatInterval = 24L
-
 
             val calendar = Calendar.getInstance()
             val now = calendar.timeInMillis
@@ -71,13 +67,24 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
 
         val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
         backupTaskMiddleware.getAll().forEach {
-            val hasRunBefore = it.lastSuccessfulBackup != NEVER
-            val daysDifference = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
-            val wasntToday = daysDifference != 0L
-            val wasXDaysAgo = (daysDifference % warningIntervalInDays == 0L)
-            if( hasRunBefore && wasntToday && wasXDaysAgo) {
-                Notifications(mContext, 0).notifyOutdatedBackup(it)
+
+            // dont warn when we don't have a warning
+            if(it.warningTimeout == WARNING_DISABLED) {
+                return@forEach
             }
+
+            //  or if we never ran to begin with.
+            if(it.lastSuccessfulBackup == NEVER) {
+                return@forEach
+            }
+
+            val daysSinceLastRun = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
+            if(daysSinceLastRun < it.warningTimeout) {
+                // the timeout is bigger than the passed time since the last run
+                return@forEach
+            }
+
+            Notifications(mContext, 0).notifyOutdatedBackup(it)
         }
         return Result.success()
     }

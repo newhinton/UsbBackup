@@ -12,7 +12,8 @@ data class BackupTask (
     @ColumnInfo(name = "targetUri") val targetUri: String,
     @ColumnInfo(name = "containerPW") var containerPW: String?,
     @ColumnInfo(name = "enabled") var enabled: Boolean,
-    @ColumnInfo(name = "lastSuccessfulBackup") var lastSuccessfulBackup: Long? = NEVER
+    @ColumnInfo(name = "lastSuccessfulBackup") var lastSuccessfulBackup: Long? = NEVER,
+    @ColumnInfo(name = "warningTimeout") var warningTimeout: Long = WARNING_DISABLED
 ) {
 
     @Ignore var sources: ArrayList<Source> = arrayListOf()
@@ -23,8 +24,9 @@ data class BackupTask (
 
     companion object {
         const val NEVER = -1L
+        const val WARNING_DISABLED = 0L
         fun new(name: String, sources: ArrayList<Source>, targetUri: String): BackupTask {
-            val task = BackupTask(null, name, targetUri, null, true, NEVER)
+            val task = BackupTask(null, name, targetUri, null, true, NEVER, WARNING_DISABLED)
             task.sources = sources
             return task
         }

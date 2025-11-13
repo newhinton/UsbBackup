@@ -116,7 +116,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         val mBuilder = NotificationCompat.Builder(mContext)
             .setChannelId(NOTIFICATION_CHANNEL_BACKUP_OUTDATED_ID)
             .setSmallIcon(R.drawable.icon_usb_error)
-            .setColor(Color.rgb(242, 115, 22))
+            .setColor(Color.rgb(204, 0, 0))
             .setColorized(true)
             .setContentTitle("Backup '${task.name}' outdated!")
             .setContentText("Last Backup: $relative\nPlease insert the appropriate media soon!")
