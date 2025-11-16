@@ -99,7 +99,9 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
                     if(mExistingId == -1) {
                         mbackupMiddleware.insert(backup)
                     } else {
+                        val existing = mbackupMiddleware.get(mExistingId)
                         backup.id = mExistingId
+                        backup.lastSuccessfulBackup = existing.lastSuccessfulBackup
                         mbackupMiddleware.update(backup)
                     }
                 }
@@ -121,6 +123,7 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
                     binding.nameTextfield.setText(existing.name)
                     mTargetUri = existing.targetUri.toUri()
                     binding.pwTextfield.setText(existing.containerPW)
+                    binding.warningTimeoutTextfield.setText(existing.warningTimeout.toString())
                     updateUi()
                 }
             }

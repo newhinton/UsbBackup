@@ -25,6 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java, "usbbackup"
             )
                 .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_3_4)
                 .build()
 
             return db
@@ -38,7 +39,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE BackupTask ADD COLUMN lastSuccessfulBackup INTEGER DEFAULT -1")
+                db.execSQL("ALTER TABLE BackupTask ADD COLUMN warningTimeout INTEGER DEFAULT 0")
             }
         }
     }

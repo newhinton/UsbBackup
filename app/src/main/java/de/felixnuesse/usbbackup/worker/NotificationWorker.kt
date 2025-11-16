@@ -4,11 +4,14 @@ import android.content.Context
 import android.util.Log
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
@@ -23,10 +26,11 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
         private const val DAILY_HOUR_TO_RUN = 19
 
         fun now(context: Context) {
-            val data = Data.Builder()
+            Log.e("NW", "Trigger notification worker now")
             val request = OneTimeWorkRequestBuilder<NotificationWorker>()
-            request.setInputData(data.build())
-            WorkManager.getInstance(context).enqueue(request.build())
+            request.setInputData(workDataOf("forceRun" to true))
+            request.setInitialDelay(0, TimeUnit.MILLISECONDS)
+            WorkManager.getInstance(context).enqueueUniqueWork("test", ExistingWorkPolicy.REPLACE, request.build())
         }
 
         fun schedule(context: Context) {
@@ -65,8 +69,12 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
 
     override fun doWork(): Result {
 
+        Log.e("NW", "Start notification worker now")
+
         val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
         backupTaskMiddleware.getAll().forEach {
+
+
 
             // dont warn when we don't have a warning
             if(it.warningTimeout == WARNING_DISABLED) {
@@ -79,7 +87,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             }
 
             val daysSinceLastRun = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
-            if(daysSinceLastRun < it.warningTimeout) {
+            if(daysSinceLastRun < it.getWarningTimeout()) {
                 // the timeout is bigger than the passed time since the last run
                 return@forEach
             }

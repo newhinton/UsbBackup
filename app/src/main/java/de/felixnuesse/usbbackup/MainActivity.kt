@@ -14,11 +14,15 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
+import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
+import de.felixnuesse.usbbackup.utils.DateFormatter
 import de.felixnuesse.usbbackup.worker.NotificationWorker
+import de.felixnuesse.usbbackup.worker.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,6 +75,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
         updateList()
 
         NotificationWorker.schedule(this)
+        NotificationWorker.now(this)
     }
 
     override fun onResume() {
