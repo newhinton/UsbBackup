@@ -52,7 +52,7 @@
     <string name="folders">Folders:</string>
     <string name="notification_last_backup_outdated">Backup \'%1$s\' outdated!</string>
     <string name="notification_last_backup_outdated_description">Last Backup: %1$s Please insert the appropriate media soon!</string>
-    <string name="notification_scanning_storage">Scanning newly attached storage...</string>
+    <string name="notification_scanning_storage">Scanning newly attached storage…</string>
     <string name="notification_scanning_storage_description">We will start a backup when we find appropriate storage media!</string>
     <string name="cancel">Cancel</string>
     <string name="notification_channel_backup_worker">Backup Worker Channel</string>

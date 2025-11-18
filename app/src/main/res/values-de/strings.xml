@@ -35,8 +35,8 @@
     <string name="archival_location">Archivort:</string>
     <string name="folders">Ordner:</string>
     <string name="notification_last_backup_outdated">Backup \'%1$s\' veraltet!</string>
-    <string name="notification_last_backup_outdated_description">Letztes Backup: %1$s\\nBitte verbinde das passende Speichergerät zeitnah!</string>
-    <string name="notification_scanning_storage">Durchsuche neu verbundene Speichermedien...</string>
+    <string name="notification_last_backup_outdated_description">Letztes Backup: %1$s\nBitte verbinde das passende Speichergerät zeitnah!</string>
+    <string name="notification_scanning_storage">Durchsuche neu verbundene Speichermedien…</string>
     <string name="notification_scanning_storage_description">Wir starten ein backup wenn wir das passende Speichermedium gefunden haben!</string>
     <string name="cancel">Abbrechen</string>
 </resources>
