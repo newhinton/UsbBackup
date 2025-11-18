@@ -40,5 +40,25 @@
     <string name="main_cryptowarning_icon_description">Circle with an I inside. Indicating additional information</string>
     <string name="main_cryptowarning">Warning! This app\'s cryptography has not been independently verified. Use at your own risk!</string>
     <string name="main_addicon_description">Floating Action Button with a plus sign, indicating adding an configuration entry</string>
+    <string name="menu_main_checkoutdated">Check for outdated Archives</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="disable">Disable</string>
+    <string name="enable">Enable</string>
+    <string name="media_available_click_to_make_a_backup">Media Available. Click to make a backup!</string>
+    <string name="warning_no_password_set_backup_will_be_unencrypted">Warning! No password set. Backup will be unencrypted!</string>
+    <string name="archival_location">Archival Location:</string>
+    <string name="folders">Folders:</string>
+    <string name="notification_last_backup_outdated">Backup \'%1$s\' outdated!</string>
+    <string name="notification_last_backup_outdated_description">Last Backup: %1$s Please insert the appropriate media soon!</string>
+    <string name="notification_scanning_storage">Scanning newly attached storage...</string>
+    <string name="notification_scanning_storage_description">We will start a backup when we find appropriate storage media!</string>
+    <string name="cancel">Cancel</string>
+    <string name="notification_channel_backup_worker">Backup Worker Channel</string>
+    <string name="notification_channel_backup_worker_success">Backup Worker Success Channel</string>
+    <string name="notification_channel_backup_worker_error">Backup Worker Error Channel</string>
+    <string name="notification_channel_outdated_backup">Outdated Backup Channel</string>
+    <string name="notification_channel_foreground_media_scan">Foreground Media Scan Channel</string>
 
 </resources>

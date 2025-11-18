@@ -24,4 +24,19 @@
     <string name="about_icon_description">Icon dieser App</string>
     <string name="add_down_icon_description">Platzhalter-Icon, Pfeil der nach unten zeigt.</string>
     <string name="add_fakelistheader_encrypt">Verschlüsseln</string>
+    <string name="menu_main_checkoutdated">Nach veralteten Archiven suchen</string>
+    <string name="duplicate">Kopieren</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="delete">Löschen</string>
+    <string name="disable">Deaktivieren</string>
+    <string name="enable">Aktivieren</string>
+    <string name="media_available_click_to_make_a_backup">Speichergerät verfügar! Archiv anlegen!</string>
+    <string name="warning_no_password_set_backup_will_be_unencrypted">Warnung! Kein Password gesetzt. Archiv wird nicht verschlüsselt sein!</string>
+    <string name="archival_location">Archivort:</string>
+    <string name="folders">Ordner:</string>
+    <string name="notification_last_backup_outdated">Backup \'%1$s\' veraltet!</string>
+    <string name="notification_last_backup_outdated_description">Letztes Backup: %1$s\\nBitte verbinde das passende Speichergerät zeitnah!</string>
+    <string name="notification_scanning_storage">Durchsuche neu verbundene Speichermedien...</string>
+    <string name="notification_scanning_storage_description">Wir starten ein backup wenn wir das passende Speichermedium gefunden haben!</string>
+    <string name="cancel">Abbrechen</string>
 </resources>

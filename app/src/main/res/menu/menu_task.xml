@@ -3,18 +3,18 @@
 
     <item
         android:id="@+id/taskMenuItemCopy"
-        android:title="Duplicate" />
+        android:title="@string/duplicate" />
     <item
         android:id="@+id/taskMenuItemEdit"
-        android:title="Edit" />
+        android:title="@string/edit" />
     <item
         android:id="@+id/taskMenuItemDelete"
         android:icon="@drawable/icon_delete"
-        android:title="Delete" />
+        android:title="@string/delete" />
     <item
         android:id="@+id/taskMenuItemDisable"
-        android:title="Disable" />
+        android:title="@string/disable" />
     <item
         android:id="@+id/taskMenuItemEnable"
-        android:title="Enable" />
+        android:title="@string/enable" />
 </menu>

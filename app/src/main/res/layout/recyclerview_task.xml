@@ -56,7 +56,7 @@
                 android:id="@+id/labelSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Folders:"
+                android:text="@string/folders"
                 android:visibility="gone"
                 tools:layout_editor_absoluteY="48dp" />
 
@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Archival Location:"
+                android:text="@string/archival_location"
                 app:layout_constraintStart_toStartOf="@+id/labelSource"
                 app:layout_constraintTop_toBottomOf="@+id/icon" />
 
@@ -110,7 +110,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
-                android:text="Warning! No password set. Backup will be unencrypted!"
+                android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
                 android:textColor="#D00000"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/labelTarget"
@@ -149,12 +149,12 @@
 
                 <TextView
                     android:id="@+id/textView"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Media Available. Click to make a backup!" />
+                    android:text="@string/media_available_click_to_make_a_backup" />
 
 
                 <com.google.android.material.button.MaterialButton
