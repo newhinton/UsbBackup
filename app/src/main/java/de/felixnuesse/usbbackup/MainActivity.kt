@@ -20,9 +20,7 @@ import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
-import de.felixnuesse.usbbackup.utils.DateFormatter
 import de.felixnuesse.usbbackup.worker.NotificationWorker
-import de.felixnuesse.usbbackup.worker.Notifications
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,7 +73,6 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
         updateList()
 
         NotificationWorker.schedule(this)
-        NotificationWorker.now(this)
     }
 
     override fun onResume() {
@@ -177,6 +174,10 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
             when(menuItem.itemId) {
                 R.id.action_about -> {
                     startActivity(Intent(this, AboutActivity::class.java))
+                    true
+                }
+                R.id.action_check_outdated -> {
+                    NotificationWorker.now(this)
                     true
                 }
                 else -> false

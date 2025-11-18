@@ -31,44 +31,34 @@
 
 
             <ImageView
-                android:id="@+id/noPasswordImageView"
+                android:id="@+id/icon"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:padding="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/icon_lock_open"
-                app:tint="#D00000" />
-
-            <ImageView
-                android:id="@+id/passwordImageView"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="8dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/icon_lock"
+                app:srcCompat="@drawable/cloud_download_24px"
                 app:tint="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:layout_constraintBottom_toBottomOf="@+id/noPasswordImageView"
+                app:layout_constraintBottom_toBottomOf="@+id/icon"
                 app:layout_constraintEnd_toStartOf="@+id/moreButton"
-                app:layout_constraintStart_toEndOf="@+id/noPasswordImageView"
-                app:layout_constraintTop_toTopOf="@+id/noPasswordImageView" />
+                app:layout_constraintStart_toEndOf="@+id/icon"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/labelSource"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:text="Source:"
-                app:layout_constraintStart_toStartOf="@+id/noPasswordImageView"
-                app:layout_constraintTop_toBottomOf="@+id/noPasswordImageView" />
+                android:text="Folders:"
+                android:visibility="gone"
+                tools:layout_editor_absoluteY="48dp" />
 
             <TextView
                 android:id="@+id/source"
@@ -77,6 +67,7 @@
                 android:layout_marginStart="8dp"
                 android:singleLine="false"
                 android:text="TextView"
+                android:visibility="gone"
                 app:layout_constraintEnd_toStartOf="@+id/moreButton"
                 app:layout_constraintStart_toStartOf="@+id/labelSource"
                 app:layout_constraintTop_toBottomOf="@+id/labelSource" />
@@ -86,18 +77,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Target:"
+                android:text="Archival Location:"
                 app:layout_constraintStart_toStartOf="@+id/labelSource"
-                app:layout_constraintTop_toBottomOf="@+id/source" />
+                app:layout_constraintTop_toBottomOf="@+id/icon" />
 
             <TextView
                 android:id="@+id/target"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:singleLine="true"
                 android:text="TextView"
-                app:layout_constraintEnd_toEndOf="@+id/source"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/labelTarget"
                 app:layout_constraintTop_toBottomOf="@+id/labelTarget" />
@@ -125,24 +117,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/target" />
 
             <TextView
-                android:id="@+id/labelLastSuccessfulRun"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="16dp"
-                android:text="Last Successful Run:"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/noPasswordTextView" />
-
-            <TextView
                 android:id="@+id/lastSuccessfulRun"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
-                android:text="Never"
+                android:layout_marginTop="16dp"
+                android:textAlignment="center"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/labelLastSuccessfulRun"
-                app:layout_constraintTop_toTopOf="@+id/labelLastSuccessfulRun" />
+                app:layout_constraintStart_toStartOf="@+id/noPasswordTextView"
+                app:layout_constraintTop_toBottomOf="@+id/noPasswordTextView" />
 
             <LinearLayout
                 android:id="@+id/layoutDiskAvailable"

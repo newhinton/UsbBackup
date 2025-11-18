@@ -94,10 +94,10 @@ class UriUtils {
             val id = getStorageLabel(context, uri)
             try {
                 val folder = DocumentFile.fromTreeUri(context, uri)
-                return "$id: ${folder?.name}"
+                return "$id:${folder?.name}"
             } catch (e: Exception) {
                 val file = DocumentFile.fromSingleUri(context, uri)
-                return "$id: ${file?.name}"
+                return "$id:${file?.name}"
             }
         }
     }

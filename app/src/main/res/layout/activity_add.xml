@@ -42,19 +42,20 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp">
+            android:layout_margin="8dp"
+            android:padding="8dp">
 
             <TextView
                 android:id="@+id/sourceUri"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 android:singleLine="true"
                 android:text="@string/source_folder"
+                app:layout_constraintBottom_toBottomOf="@+id/sourceUriFolderButton"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFileButton"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/sourceUriFolderButton" />
 
 
             <androidx.recyclerview.widget.RecyclerView
@@ -63,7 +64,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="@+id/sourceUriFolderButton"
                 app:layout_constraintStart_toStartOf="@+id/sourceUri"
-                app:layout_constraintTop_toBottomOf="@+id/sourceUriFolderButton" />
+                app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/sourceUriFileButton"
@@ -71,30 +72,30 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
+                android:visibility="gone"
                 app:icon="@drawable/icon_insert_drive_file"
-                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
+                app:iconTint="?attr/colorOnPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/sourceUriFolderButton"
                 app:layout_constraintEnd_toStartOf="@+id/sourceUriFolderButton"
-                app:layout_constraintTop_toTopOf="@+id/sourceUri"
-                tools:visibility="gone" />
+                app:layout_constraintTop_toTopOf="@+id/sourceUriFolderButton" />
 
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/sourceUriFolderButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/icon_folder"
-                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
+                app:iconTint="?attr/colorOnPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
                 android:layout_marginTop="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -128,13 +129,23 @@
                 android:id="@+id/targetUriFolderButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
                 android:minWidth="0dp"
                 app:icon="@drawable/icon_folder"
-                app:iconTint="?attr/colorOnPrimary"
                 app:iconPadding="0dp"
+                app:iconTint="?attr/colorOnPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/targetLabel" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Encrypt?"
+                android:textAlignment="textEnd"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/sourceUriFolderButton" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

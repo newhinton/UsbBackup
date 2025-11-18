@@ -1,5 +1,7 @@
 package de.felixnuesse.usbbackup
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -21,6 +23,7 @@ import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.database.Source
 import de.felixnuesse.usbbackup.databinding.ActivityAddBinding
 import de.felixnuesse.usbbackup.extension.visible
+import de.felixnuesse.usbbackup.extension.visibleAnimated
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -74,7 +77,6 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
         binding.nameTextfield.addTextChangedListener(getUpdateableTextWatcher())
         binding.pwTextfield.addTextChangedListener(getUpdateableTextWatcher())
         binding.warningTimeoutTextfield.addTextChangedListener(getUpdateableTextWatcher())
-
 
         binding.saveFab.setOnClickListener {
             mTargetUri?.let { uri -> persist(uri) }
@@ -164,12 +166,12 @@ class AddActivity : AppCompatActivity(), SourceItemCallback {
         val encryptionConditions = (hasEncryptedSourceEntries && passwordSet) || !hasEncryptedSourceEntries
         binding.saveFab.isEnabled = baseConditions && encryptionConditions
 
-        binding.pwInput.visible(hasEncryptedSourceEntries)
-        binding.layoutNoPassword.visible(!passwordSet && hasEncryptedSourceEntries)
+        binding.pwInput.visibleAnimated(hasEncryptedSourceEntries)
+        binding.layoutNoPassword.visibleAnimated(!passwordSet && hasEncryptedSourceEntries)
 
         // data
         if(hasTarget) {
-            binding.targetUriMetadata.text = getStorageLabel(this, mTargetUri!!) + ": "+mTargetUri!!.path?.split(":")[1]
+            binding.targetUriMetadata.text = getStorageLabel(this, mTargetUri!!) + ":"+mTargetUri!!.path?.split(":")[1]
         }
 
         binding.sourceList.layoutManager = LinearLayoutManager(this)

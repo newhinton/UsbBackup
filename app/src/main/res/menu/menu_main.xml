@@ -10,4 +10,11 @@
         android:title="@string/about"
         app:showAsAction="always" />
 
+
+    <item
+        android:id="@+id/action_check_outdated"
+        android:icon="@drawable/icon_harddisk_check"
+        android:title="Check for outdated"
+        app:showAsAction="always" />
+
 </menu>

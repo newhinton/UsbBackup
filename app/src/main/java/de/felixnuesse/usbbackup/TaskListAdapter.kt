@@ -32,7 +32,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
 
             val targetUri = task.targetUri.toUri()
-            val targetUriName = getStorageLabel(mContext, targetUri) + ": "+targetUri.path?.split(":")[1]
+            val targetUriName = getStorageLabel(mContext, targetUri) + ":"+targetUri.path?.split(":")[1]
 
             binding.source.text = task.sources.joinToString("\n") { getUriMetadata(mContext, it.uri.toUri())}
             binding.target.text = targetUriName
@@ -42,17 +42,16 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 menu.show()
             }
 
+            binding.lastSuccessfulRun.visibility = View.GONE
             if(task.lastSuccessfulBackup != BackupTask.NEVER) {
-                binding.lastSuccessfulRun.text = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
+                val date = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
+                val string = mContext.getString(R.string.last_successful_run, date)
+                binding.lastSuccessfulRun.text = string
+                binding.lastSuccessfulRun.visibility = View.VISIBLE
             }
 
             if(!task.containerPW.isNullOrBlank()) {
                 binding.noPasswordTextView.visibility = View.GONE
-                binding.noPasswordImageView.visibility = View.INVISIBLE
-                binding.passwordImageView.visibility = View.VISIBLE
-            } else {
-                binding.noPasswordImageView.visibility = View.VISIBLE
-                binding.passwordImageView.visibility = View.INVISIBLE
             }
 
 

@@ -24,6 +24,7 @@
             android:layout_weight="0"
             android:background="@android:color/transparent"
             android:contentDescription="@string/delete_button_for_source_item"
+            android:tint="?attr/colorOnSecondaryContainer"
             app:srcCompat="@drawable/icon_delete" />
 
         <androidx.appcompat.widget.SwitchCompat

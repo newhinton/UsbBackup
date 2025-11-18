@@ -22,13 +22,14 @@
     <string name="intro_slide_done_title">Done!</string>
     <string name="intro_slide_done_description">You are now ready to start! You can now configure your backups!</string>
     <string name="about">About</string>
-    <string name="source_folder">Source Folder:</string>
-    <string name="target_folder">Target Folder:</string>
+    <string name="source_folder">Select sources for archival:</string>
+    <string name="target_folder">Select archival location:</string>
     <string name="title_of_the_task">Title of the Task</string>
     <string name="warning_no_password_set">No password set. Please enter a password!</string>
     <string name="password">Password</string>
     <string name="delete_button_for_source_item">Delete Button for Source Item</string>
     <string name="starting_scan_service">Starting scan service…</string>
     <string name="warningTimeout">Warning Timeout (0 to disable)</string>
+    <string name="last_successful_run">Last ran at %s</string>
 
 </resources>
