@@ -4,7 +4,7 @@
     <string name="donate">Donate</string>
     <string name="made_by">Made by:</string>
     <string name="help">Help</string>
-    <string name="copyright">"GPLv3 - ©%1$s "</string>
+    <string name="copyright" translatable="false">"GPLv3 - ©%1$s "</string>
     <string name="back">Back</string>
 
 
@@ -30,6 +30,15 @@
     <string name="delete_button_for_source_item">Delete Button for Source Item</string>
     <string name="starting_scan_service">Starting scan service…</string>
     <string name="warningTimeout">Warning Timeout (0 to disable)</string>
-    <string name="last_successful_run">Last ran at %s</string>
+    <string name="last_successful_run">Last Archive %s</string>
+    <string name="about_icon_description">Icon of this App</string>
+    <string name="add_down_icon_description">Spacer icon, Arrow facing downward to indicate data flowing from the above list to the selected folder below.</string>
+    <string name="add_fakelistheader_encrypt">Encrypt</string>
+    <string name="add_warning_icon_description">Icon in the form of an open lock. Warning that no password is set.</string>
+    <string name="add_fabicon_description">Floating Action Button with a save icon.</string>
+    <string name="main_mainicon_description">App Logo in form of a usb-stick</string>
+    <string name="main_cryptowarning_icon_description">Circle with an I inside. Indicating additional information</string>
+    <string name="main_cryptowarning">Warning! This app\'s cryptography has not been independently verified. Use at your own risk!</string>
+    <string name="main_addicon_description">Floating Action Button with a plus sign, indicating adding an configuration entry</string>
 
 </resources>

@@ -7,11 +7,12 @@ plugins {
 
 android {
     namespace = "de.felixnuesse.usbbackup"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "de.felixnuesse.usbbackup"
         minSdk = 30
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -40,7 +41,9 @@ android {
         buildConfig = true
     }
 
-
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
 
     applicationVariants.all {
         //outputs.all { output ->

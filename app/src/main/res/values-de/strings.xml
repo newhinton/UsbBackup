@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">UsbBackup</string>
+    <string name="donate">Spenden</string>
+    <string name="made_by">Von:</string>
+    <string name="help">Hilfe:</string>
+    <string name="back">Zurück</string>
+    <string name="intro_slide_welcome_title">Wilkommen!</string>
+    <string name="intro_slide_welcome_description">Diese App hilft dir, wichtige Daten auf einem USB-Stick zu sichern. Bitte lies die kommenden Slides aufmerksam!</string>
+    <string name="intro_slide_notification_title">Werd Benachrichtigt!</string>
+    <string name="intro_slide_notification_description">Wir zeigen dir Benachrichtigungen beim sichern. Wir spammen nicht!</string>
+    <string name="intro_slide_warning_title">Warnung!</string>
+    <string name="intro_slide_done_title">Fertig!</string>
+    <string name="intro_slide_done_description">Du kannst nun anfangen! Leg ein paar Backups an!</string>
+    <string name="about">Über</string>
+    <string name="source_folder">Quellen für\'s archivieren:</string>
+    <string name="target_folder">Archivort auswählen:</string>
+    <string name="title_of_the_task">Name dieser Sicherung</string>
+    <string name="warning_no_password_set">Kein Passwort gesetzt. Bitte gib eines ein!</string>
+    <string name="password">Passwort</string>
+    <string name="delete_button_for_source_item">Lösch-Schaltfläche für Quelle</string>
+    <string name="starting_scan_service">Starte den Scan-Service…</string>
+    <string name="last_successful_run">Letzes Arciv %s</string>
+    <string name="about_icon_description">Icon dieser App</string>
+    <string name="add_down_icon_description">Platzhalter-Icon, Pfeil der nach unten zeigt.</string>
+    <string name="add_fakelistheader_encrypt">Verschlüsseln</string>
+</resources>
