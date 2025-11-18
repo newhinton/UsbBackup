@@ -20,7 +20,7 @@
     <string name="password">Passwort</string>
     <string name="delete_button_for_source_item">Lösch-Schaltfläche für Quelle</string>
     <string name="starting_scan_service">Starte den Scan-Service…</string>
-    <string name="last_successful_run">Letzes Arciv %s</string>
+    <string name="last_successful_run">Letzes Archiv %s</string>
     <string name="about_icon_description">Icon dieser App</string>
     <string name="add_down_icon_description">Platzhalter-Icon, Pfeil der nach unten zeigt.</string>
     <string name="add_fakelistheader_encrypt">Verschlüsseln</string>
