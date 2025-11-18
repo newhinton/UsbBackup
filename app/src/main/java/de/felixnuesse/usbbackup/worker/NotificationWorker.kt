@@ -26,7 +26,6 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
         private const val DAILY_HOUR_TO_RUN = 19
 
         fun now(context: Context) {
-            Log.e("NW", "Trigger notification worker now")
             val request = OneTimeWorkRequestBuilder<NotificationWorker>()
             request.setInputData(workDataOf("forceRun" to true))
             request.setInitialDelay(0, TimeUnit.MILLISECONDS)
@@ -68,14 +67,8 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
     }
 
     override fun doWork(): Result {
-
-        Log.e("NW", "Start notification worker now")
-
         val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
         backupTaskMiddleware.getAll().forEach {
-
-
-
             // dont warn when we don't have a warning
             if(it.warningTimeout == WARNING_DISABLED) {
                 return@forEach
@@ -86,7 +79,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
                 return@forEach
             }
 
-            val daysSinceLastRun = DateFormatter.daysDifference(it.getLastSuccessfulBackup())
+            val daysSinceLastRun = DateFormatter.daysDifference(it.getLastSuccessfulBackup()) * -1
             if(daysSinceLastRun < it.getWarningTimeout()) {
                 // the timeout is bigger than the passed time since the last run
                 return@forEach
