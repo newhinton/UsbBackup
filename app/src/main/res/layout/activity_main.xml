@@ -5,17 +5,18 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorSurfaceVariant"
     tools:context=".MainActivity">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:padding="16dp"
-        app:cardCornerRadius="8dp"
+        app:cardCornerRadius="36dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -23,8 +24,11 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="64dp"
+            android:background="@color/colorPrimary"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
 
             <ImageView
                 android:layout_width="48dp"
@@ -34,7 +38,7 @@
                 android:padding="24dp"
                 android:scaleType="center"
                 android:src="@drawable/ic_launcher_foreground"
-                app:tint="@color/ic_launcher_background" />
+                android:tint="@color/colorOnPrimary" />
 
             <TextView
                 android:id="@+id/textView5"
@@ -42,7 +46,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/app_name"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorOnPrimary" />
 
             <ImageButton
                 android:id="@+id/moreButton"
@@ -50,8 +55,8 @@
                 android:layout_height="48dp"
                 android:background="@null"
                 android:contentDescription="@string/main_mainicon_description"
-                android:src="@drawable/icon_more"
-                app:tint="?attr/colorPrimary" />
+                android:src="@drawable/icon_more_vert"
+                app:tint="?attr/colorOnPrimary" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

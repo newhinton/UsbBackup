@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.PopupMenu
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -85,7 +86,6 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 val adapter = TaskListAdapter(mBackupTaskMiddleware.getAll(), this@MainActivity, this@MainActivity)
-
                 val handler = Handler(Looper.getMainLooper())
                 handler.post {
                     binding.taskList.setLayoutManager(LinearLayoutManager(this@MainActivity))

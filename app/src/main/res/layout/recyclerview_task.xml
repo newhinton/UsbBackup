@@ -8,16 +8,15 @@
     tools:context=".MainActivity" >
 
 
-    <androidx.cardview.widget.CardView
+    <de.felixnuesse.usbbackup.CustomizableCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="1dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="14dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
+        android:layout_marginBottom="1dp"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,23 +30,33 @@
 
 
             <ImageView
+                android:id="@+id/iconBg"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/circle"
+                app:layout_constraintBottom_toBottomOf="@+id/icon"
+                app:layout_constraintEnd_toEndOf="@+id/icon"
+                app:layout_constraintStart_toStartOf="@+id/icon"
+                app:layout_constraintTop_toTopOf="@+id/icon" />
+
+            <ImageView
                 android:id="@+id/icon"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/cloud_download_24px"
-                app:tint="?attr/colorOnSurface" />
+                app:tint="@color/colorOnPrimaryContainer" />
 
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                app:layout_constraintBottom_toBottomOf="@+id/icon"
                 app:layout_constraintEnd_toStartOf="@+id/moreButton"
                 app:layout_constraintStart_toEndOf="@+id/icon"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -76,23 +85,21 @@
                 android:id="@+id/labelTarget"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:text="@string/archival_location"
-                app:layout_constraintStart_toStartOf="@+id/labelSource"
-                app:layout_constraintTop_toBottomOf="@+id/icon" />
+                app:layout_constraintStart_toStartOf="@+id/title"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <TextView
                 android:id="@+id/target"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:singleLine="true"
                 android:text="TextView"
                 android:textStyle="italic"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/moreButton"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/labelTarget"
-                app:layout_constraintTop_toBottomOf="@+id/labelTarget" />
+                app:layout_constraintStart_toEndOf="@+id/labelTarget"
+                app:layout_constraintTop_toTopOf="@+id/labelTarget" />
 
             <ImageView
                 android:id="@+id/moreButton"
@@ -109,6 +116,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center_vertical"
                 android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
                 android:textColor="#D00000"
@@ -129,9 +137,8 @@
 
             <LinearLayout
                 android:id="@+id/layoutDiskAvailable"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="16dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:orientation="horizontal"
@@ -172,6 +179,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.cardview.widget.CardView>
+    </de.felixnuesse.usbbackup.CustomizableCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

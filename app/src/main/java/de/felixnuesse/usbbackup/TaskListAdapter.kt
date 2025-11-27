@@ -3,6 +3,7 @@ package de.felixnuesse.usbbackup
 import android.content.Context
 import android.graphics.Paint
 import android.icu.text.RelativeDateTimeFormatter
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,12 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.impl.background.systemjob.setRequiredNetworkRequest
 import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
+import de.felixnuesse.usbbackup.extension.toDp
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import de.felixnuesse.usbbackup.worker.BackupWorker
 import java.time.Duration
@@ -23,6 +26,7 @@ import java.time.Instant
 class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context, private val mPopupCallback: PopupCallback) : RecyclerView.Adapter<TaskListAdapter.Row>() {
 
     inner class Row(var binding: RecyclerviewTaskBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun setTask(task: BackupTask) {
             binding.title.text = task.name
 
@@ -71,6 +75,21 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
             binding.startBackup.setOnClickListener {
                 BackupWorker.now(mContext, task.id!!)
                 Toast.makeText(mContext, "Start Task: ${task.name}", Toast.LENGTH_SHORT).show()
+            }
+
+
+            val index = tasks.indexOf(task)
+            val isFirst = index == 0
+            val isLast = index == tasks.size-1
+
+            binding.cardView.setTopCorner(4.toDp(mContext))
+            binding.cardView.setBottomCorner(4.toDp(mContext))
+
+            if(isFirst) {
+                binding.cardView.setTopCorner(24.toDp(mContext))
+            }
+            if(isLast) {
+                binding.cardView.setBottomCorner(24.toDp(mContext))
             }
 
         }

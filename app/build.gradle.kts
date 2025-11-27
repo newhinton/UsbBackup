@@ -11,8 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "de.felixnuesse.usbbackup"
-        minSdk = 30
-        //noinspection OldTargetApi
+        minSdk = 31
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"

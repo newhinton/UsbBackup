@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <!-- Add any more colours you need here -->
+
+    <color name="colorPrimary">@android:color/system_primary_dark</color>
+    <color name="colorOnPrimary">@android:color/system_on_primary_dark</color>
+    <color name="colorPrimaryContainer">@android:color/system_primary_container_dark</color>
+    <color name="colorOnPrimaryContainer">@android:color/system_on_primary_container_dark</color>
+    <color name="colorPrimaryInverse">@android:color/system_primary_light</color>
+    <color name="colorPrimaryFixed">@android:color/system_primary_fixed</color>
+    <color name="colorPrimaryFixedDim">@android:color/system_primary_fixed_dim</color>
+    <color name="colorOnPrimaryFixed">@android:color/system_on_primary_fixed</color>
+    <color name="colorOnPrimaryFixedVariant">@android:color/system_on_primary_fixed_variant</color>
+    <color name="colorSecondary">@android:color/system_secondary_dark</color>
+    <color name="colorOnSecondary">@android:color/system_on_secondary_dark</color>
+    <color name="colorSecondaryContainer">@android:color/system_secondary_container_dark</color>
+    <color name="colorOnSecondaryContainer">@android:color/system_on_secondary_container_dark</color>
+    <color name="colorSecondaryFixed">@android:color/system_secondary_fixed</color>
+    <color name="colorSecondaryFixedDim">@android:color/system_secondary_fixed_dim</color>
+    <color name="colorOnSecondaryFixed">@android:color/system_on_secondary_fixed</color>
+    <color name="colorOnSecondaryFixedVariant">@android:color/system_on_secondary_fixed_variant</color>
+    <color name="colorTertiary">@android:color/system_tertiary_dark</color>
+    <color name="colorOnTertiary">@android:color/system_on_tertiary_dark</color>
+    <color name="colorTertiaryContainer">@android:color/system_tertiary_container_dark</color>
+    <color name="colorOnTertiaryContainer">@android:color/system_on_tertiary_container_dark</color>
+    <color name="colorTertiaryFixed">@android:color/system_tertiary_fixed</color>
+    <color name="colorTertiaryFixedDim">@android:color/system_tertiary_fixed_dim</color>
+    <color name="colorOnTertiaryFixed">@android:color/system_on_tertiary_fixed</color>
+    <color name="colorOnTertiaryFixedVariant">@android:color/system_on_tertiary_fixed_variant</color>
+
+    <color name="colorError">@android:color/system_error_dark</color>
+    <color name="colorOnError">@android:color/system_on_error_dark</color>
+    <color name="colorErrorContainer">@android:color/system_error_container_dark</color>
+    <color name="colorOnErrorContainer">@android:color/system_on_error_container_dark</color>
+    <color name="colorOutline">@android:color/system_outline_dark</color>
+    <color name="colorOutlineVariant">@android:color/system_outline_variant_dark</color>
+    <color name="colorBackground">@android:color/system_background_dark</color>
+    <color name="colorOnBackground">@android:color/system_on_background_dark</color>
+    <color name="colorSurface">@android:color/system_surface_dark</color>
+    <color name="colorOnSurface">@android:color/system_on_surface_dark</color>
+    <color name="colorSurfaceVariant">@android:color/system_surface_variant_dark</color>
+    <color name="colorOnSurfaceVariant">@android:color/system_on_surface_variant_dark</color>
+    <color name="colorSurfaceInverse">@android:color/system_surface_light</color>
+    <color name="colorOnSurfaceInverse">@android:color/system_on_surface_light</color>
+    <color name="colorSurfaceBright">@android:color/system_surface_bright_dark</color>
+    <color name="colorSurfaceDim">@android:color/system_surface_dim_dark</color>
+    <color name="colorSurfaceContainer">@android:color/system_surface_container_dark</color>
+    <color name="colorSurfaceContainerLow">@android:color/system_surface_container_low_dark</color>
+    <color name="colorSurfaceContainerLowest">@android:color/system_surface_container_lowest_dark</color>
+    <color name="colorSurfaceContainerHigh">@android:color/system_surface_container_high_dark</color>
+    <color name="colorSurfaceContainerHighest">@android:color/system_surface_container_highest_dark</color>
+</resources>

@@ -76,7 +76,7 @@ class IntroActivity : AppIntro(), SlideLeaveInterface {
                 title = getString(R.string.intro_slide_warning_title),
                 description = getString(R.string.intro_slide_warning_description),
                 imageDrawable = R.drawable.icon_warning,
-                backgroundColorRes = R.color.md_theme_errorContainer_mediumContrast
+                backgroundColorRes = R.color.colorError
             ))
 
         addSlide(
