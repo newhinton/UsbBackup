@@ -29,7 +29,8 @@
     <string name="password">Password</string>
     <string name="delete_button_for_source_item">Delete Button for Source Item</string>
     <string name="starting_scan_service">Starting scan service…</string>
-    <string name="warningTimeout">Warning Timeout (0 to disable)</string>
+    <string name="warningTimeout">Warning Timeout</string>
+    <string name="add_view_warning_timeout_helper">In Days. Enter 0 to disable.</string>
     <string name="last_successful_run">Last Archive %s</string>
     <string name="about_icon_description">Icon of this App</string>
     <string name="add_down_icon_description">Spacer icon, Arrow facing downward to indicate data flowing from the above list to the selected folder below.</string>
@@ -60,5 +61,19 @@
     <string name="notification_channel_backup_worker_error">Backup Worker Error Channel</string>
     <string name="notification_channel_outdated_backup">Outdated Backup Channel</string>
     <string name="notification_channel_foreground_media_scan">Foreground Media Scan Channel</string>
+    <string name="backup_notification_error">Error!</string>
+    <string name="backup_notification_noid">The provided task did not have an ID!</string>
+    <string name="backup_notification_ongoing_title">Backing up %1$s…</string>
+    <string name="backup_notification_ongoing_">Zipping…</string>
+    <string name="backup_notification_ongoing_failure">Backup Failure!</string>
+    <string name="backup_notification_task_could_not_write_to_storage">Task: %1$s, could not write to storage: %2$s</string>
+    <string name="backup_notification_ongoing_error_with_source">Error: Could not backup!</string>
+    <string name="backup_notification_ongoing_error_with_source_details">There was an error backing up %1$s. We could not read the source folder!</string>
+    <string name="backup_notification_ongoing_storing">Storing Folder…</string>
+    <string name="backup_notification_ongoing_encrypting">Encrypting…</string>
+    <string name="backup_notification_done">Backup Done!</string>
+    <string name="backup_notification_done_remove_media">%1$s was sucessfully backed up. You can safely remove the media.</string>
+    <string name="backup_notification_unspecified_failure">Backup Failure!</string>
+    <string name="backup_notification_unspecified_failure_description">Task: %1$s, error: %2$s</string>
 
 </resources>

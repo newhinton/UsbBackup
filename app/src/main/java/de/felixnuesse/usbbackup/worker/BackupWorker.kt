@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import de.felixnuesse.crypto.Crypto
+import de.felixnuesse.usbbackup.R
 import de.felixnuesse.usbbackup.StorageUtils
 import de.felixnuesse.usbbackup.UriUtils
 import de.felixnuesse.usbbackup.database.BackupTask
@@ -100,7 +101,10 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             }
 
             if(it.id == null) {
-                mNotifications.showError("Error!", "The provided task did not have an ID!")
+                mNotifications.showError(
+                    mContext.getString(R.string.backup_notification_error), 
+                    mContext.getString(R.string.backup_notification_noid)
+                )
                 return Result.failure()
             }
 
@@ -123,12 +127,22 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     private fun processTask(backupTask: BackupTask): Boolean {
 
-        mNotifications.showNotification("Backing up ${backupTask.name}...", "Zipping...", true)
+        mNotifications.showNotification(
+            mContext.getString(R.string.backup_notification_ongoing_title, backupTask.name),
+            mContext.getString(R.string.backup_notification_ongoing_),
+            true
+        )
 
         val targetFolder = try {
             DocumentFile.fromTreeUri(mContext, backupTask.targetUri.toUri())?.createDirectory("USBBackup_${getFormattedDate()}")!!
         } catch (e: Exception) {
-            mNotifications.showError("Backup Failure!", "Task: ${backupTask.name}, could not write to storage: ${StorageUtils.state(mContext, backupTask.targetUri.toUri())}")
+            mNotifications.showError(
+                mContext.getString(R.string.backup_notification_ongoing_failure),
+                mContext.getString(
+                    R.string.backup_notification_task_could_not_write_to_storage,
+                    backupTask.name,
+                    StorageUtils.state(mContext, backupTask.targetUri.toUri())
+                ))
             return false
         }
 
@@ -149,7 +163,10 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
                     val sourceDocument = DocumentFile.fromTreeUri(mContext, sourceUri)
                     if(sourceDocument?.canRead() != true) {
-                        mNotifications.showError("Error: Could not backup!", "There was an error backing up ${backupTask.name}. We could not read the source folder!")
+                        mNotifications.showError(
+                            mContext.getString(R.string.backup_notification_ongoing_error_with_source),
+                            mContext.getString(R.string.backup_notification_ongoing_error_with_source_details, backupTask.name)
+                        )
                         return false
                     }
 
@@ -157,7 +174,12 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                         if(source.encrypt) {
                             mZipUtils.addToZipRecursive(sourceDocument, it, "${mProgress.currentSource}/", mProgress)
                         } else {
-                            mNotifications.showNotification("Backing up ${backupTask.name}...", "Storing Folder...", true, false)
+                            mNotifications.showNotification(
+                                mContext.getString(R.string.backup_notification_ongoing_title, backupTask.name),
+                                mContext.getString(R.string.backup_notification_ongoing_storing),
+                                true, 
+                                false
+                            )
                             Log.e("Tag", "Storing folder...")
                             mFsUtils.copyFolder(sourceDocument, targetFolder.createDirectory(mProgress.currentSource)!!)
                         }
@@ -182,7 +204,12 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                     return false
                 }
 
-                mNotifications.showNotification("Backing up ${backupTask.name}...", "Encrypting...", true, false)
+                mNotifications.showNotification(
+                    mContext.getString(R.string.backup_notification_ongoing_title, backupTask.name),
+                    mContext.getString(R.string.backup_notification_ongoing_encrypting),
+                    true,
+                    false
+                )
                 if(!handleEncryption(targetFolder, backupTask, unencryptedCacheFile)) {
                     return false
                 }
@@ -192,10 +219,16 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
             Log.e("Tag", "Done!")
             mNotifications.dismissDefaultNotification()
-            mNotifications.showNotificationSuccess("Backup Done!", "${backupTask.name} was sucessfully backed up. You can safely remove the media.")
+            mNotifications.showNotificationSuccess(
+                mContext.getString(R.string.backup_notification_done),
+                mContext.getString(R.string.backup_notification_done_remove_media, backupTask.name)
+            )
             return true
         } catch (e: Exception) {
-            mNotifications.showError("Backup Failure!", "Task: ${backupTask.name}, error: ${e.message}", backupTask.id!!)
+            mNotifications.showError(
+                mContext.getString(R.string.backup_notification_unspecified_failure),
+                mContext.getString(R.string.backup_notification_unspecified_failure_description, backupTask.name, e.message),
+                backupTask.id!!)
             Log.e("Tag", "Error: ${e.message}")
             e.printStackTrace()
         }
@@ -235,7 +268,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         path?.let { fileName ->
             val targetTool = targetFolder.findFile(fileName)
             if(targetTool==null || replace) {
-                mNotifications.showNotification("Backing up $taskname...", task, true)
+                mNotifications.showNotification(mContext.getString(R.string.backup_notification_ongoing_title, taskname), task, true)
                 val decryptTool = targetFolder.createFile("", fileName)!!
                 if(replace) {
                     targetTool?.delete()
@@ -255,7 +288,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
     }
 
     override fun onProgressed(message: String) {
-        mNotifications.showNotification("Backing up ${mProgress.currentSource}...", message, true, false, mProgress.getProgress())
+        mNotifications.showNotification(mContext.getString(R.string.backup_notification_ongoing_title, mProgress.currentSource), message, true, false, mProgress.getProgress())
         Log.e("TAG", "Backing up ${mProgress.currentSource}... || $message || ${mProgress.getProgress()}")
     }
 

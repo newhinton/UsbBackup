@@ -39,4 +39,18 @@
     <string name="notification_scanning_storage">Durchsuche neu verbundene Speichermedien…</string>
     <string name="notification_scanning_storage_description">Wir starten ein backup wenn wir das passende Speichermedium gefunden haben!</string>
     <string name="cancel">Abbrechen</string>
+    <string name="backup_notification_error">Fehler!</string>
+    <string name="backup_notification_noid">Die Aufgabe hatte keine ID!</string>
+    <string name="backup_notification_ongoing_title">Archiviere %1$s…</string>
+    <string name="backup_notification_ongoing_">Komprimieren…</string>
+    <string name="backup_notification_ongoing_failure">Archivierungsfehler!</string>
+    <string name="backup_notification_task_could_not_write_to_storage">Aufgabe: %1$s, konnte nicht auf das Speichermedium schreiben: %2$s</string>
+    <string name="backup_notification_ongoing_error_with_source">Fehler! Archiv konnte nicht erstellt werden!</string>
+    <string name="backup_notification_ongoing_error_with_source_details">Es gab einen Fehler beim anlegen von %1$s. Wir konnten den Quellordner nicht lesen!</string>
+    <string name="backup_notification_ongoing_storing">Ordner speichern…</string>
+    <string name="backup_notification_ongoing_encrypting">Verschlüsseln…</string>
+    <string name="backup_notification_done">Archiv fertig!</string>
+    <string name="backup_notification_done_remove_media">%1$s wurde erfolgreich archiviert. Du kannst das Speichermedium jetzt sicher entfernen.</string>
+    <string name="backup_notification_unspecified_failure">Archivierungsfehler!</string>
+    <string name="backup_notification_unspecified_failure_description">Aufgabe: %1$s, Fehler: %2$s</string>
 </resources>
