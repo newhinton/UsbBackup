@@ -27,10 +27,11 @@
             android:tint="?attr/colorOnSecondaryContainer"
             app:srcCompat="@drawable/icon_delete" />
 
-        <androidx.appcompat.widget.SwitchCompat
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/source"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:thumbIcon="@drawable/icon_lock_open"
             android:layout_marginStart="8dp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

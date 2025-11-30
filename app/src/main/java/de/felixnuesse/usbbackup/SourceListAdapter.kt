@@ -16,6 +16,7 @@ class SourceListAdapter(private val sources: List<Source>, private val mContext:
             binding.source.text = getUriMetadata(mContext, source.uri.toUri())
 
             binding.source.isChecked = source.encrypt
+            updateSwitchIcon()
 
             binding.deleteButton.setOnClickListener {
                 callbacks.delete(source.uri)
@@ -23,6 +24,15 @@ class SourceListAdapter(private val sources: List<Source>, private val mContext:
 
             binding.source.setOnCheckedChangeListener { view, isChecked ->
                 callbacks.setEncrypted(source.uri, isChecked)
+                updateSwitchIcon()
+            }
+        }
+
+        fun updateSwitchIcon() {
+            if(binding.source.isChecked) {
+                binding.source.setThumbIconResource(R.drawable.icon_lock)
+            } else {
+                binding.source.setThumbIconResource(R.drawable.icon_lock_open)
             }
         }
     }

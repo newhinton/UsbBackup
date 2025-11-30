@@ -11,6 +11,8 @@
     <color name="intro_color1_image">#673AB7</color>
     <color name="intro_color2_image">#673AB7</color>
 
+    <color name="colorText">#000000</color>
+
     <color name="colorPrimary">@android:color/system_accent1_600</color>
     <color name="colorOnPrimary">@android:color/system_accent1_0</color>
     <color name="colorPrimaryContainer">@android:color/system_accent1_100</color>

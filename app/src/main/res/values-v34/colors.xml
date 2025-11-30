@@ -4,6 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <!-- Add any more colours you need here -->
 
+    <color name="colorText">#000000</color>
+
     <color name="colorPrimary">@android:color/system_primary_light</color>
     <color name="colorOnPrimary">@android:color/system_on_primary_light</color>
     <color name="colorPrimaryContainer">@android:color/system_primary_container_light</color>

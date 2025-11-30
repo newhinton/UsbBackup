@@ -4,6 +4,8 @@
     <color name="white">#FFFFFFFF</color>
     <!-- Add any more colours you need here -->
 
+    <color name="colorText">#ffffff</color>
+
     <color name="colorPrimary">@android:color/system_accent1_200</color>
     <color name="colorOnPrimary">@android:color/system_accent1_800</color>
     <color name="colorPrimaryContainer">@android:color/system_accent1_700</color>

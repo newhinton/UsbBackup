@@ -10,7 +10,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "de.felixnuesse.usbbackup"
+        applicationId = "de.felixnuesse.usbbackup2"
         minSdk = 31
         targetSdk = 35
         versionCode = 1

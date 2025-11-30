@@ -9,5 +9,5 @@
         android:right="16dp"
         android:bottom="16dp" />
 
-    <solid android:color="@color/colorPrimary" />
+    <solid android:color="@android:color/system_primary_dark" />
 </shape>

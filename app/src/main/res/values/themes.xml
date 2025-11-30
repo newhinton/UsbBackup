@@ -4,6 +4,7 @@
         <item name="elevationOverlayColor">@color/colorPrimary</item>
         <item name="android:statusBarColor">@color/colorBackground</item>
 
+        <item name="colorText">@color/colorText</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>

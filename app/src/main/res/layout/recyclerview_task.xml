@@ -31,22 +31,24 @@
 
             <ImageView
                 android:id="@+id/iconBg"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="@drawable/circle"
-                app:layout_constraintBottom_toBottomOf="@+id/icon"
-                app:layout_constraintEnd_toEndOf="@+id/icon"
-                app:layout_constraintStart_toStartOf="@+id/icon"
-                app:layout_constraintTop_toTopOf="@+id/icon" />
+                android:forceDarkAllowed="false"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:forceDarkAllowed="false"
                 android:padding="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@+id/iconBg"
+                app:layout_constraintEnd_toEndOf="@+id/iconBg"
+                app:layout_constraintStart_toStartOf="@+id/iconBg"
+                app:layout_constraintTop_toTopOf="@+id/iconBg"
                 app:srcCompat="@drawable/cloud_download_24px"
                 app:tint="@color/colorOnPrimaryContainer" />
 
@@ -57,8 +59,9 @@
                 android:layout_marginStart="16dp"
                 android:text="TextView"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@color/colorText"
                 app:layout_constraintEnd_toStartOf="@+id/moreButton"
-                app:layout_constraintStart_toEndOf="@+id/icon"
+                app:layout_constraintStart_toEndOf="@+id/iconBg"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -93,6 +96,7 @@
                 android:id="@+id/target"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
                 android:singleLine="true"
                 android:text="TextView"
                 android:textStyle="italic"
