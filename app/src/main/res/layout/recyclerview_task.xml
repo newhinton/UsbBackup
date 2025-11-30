@@ -132,11 +132,12 @@
                 android:id="@+id/lastSuccessfulRun"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:textAlignment="center"
-                android:visibility="gone"
+                android:layout_marginEnd="16dp"
+                android:visibility="invisible"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/noPasswordTextView"
+                app:layout_constraintStart_toEndOf="@+id/iconBg"
                 app:layout_constraintTop_toBottomOf="@+id/noPasswordTextView" />
 
             <LinearLayout

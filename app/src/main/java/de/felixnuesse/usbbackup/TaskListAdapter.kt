@@ -48,7 +48,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
 
             binding.lastSuccessfulRun.visibility = View.GONE
             if(task.lastSuccessfulBackup != BackupTask.NEVER) {
-                val date = DateFormatter.relative(task.getLastSuccessfulBackup()).capitalize()
+                val date = DateFormatter.relative(task.getLastSuccessfulBackup())
                 val string = mContext.getString(R.string.last_successful_run, date)
                 binding.lastSuccessfulRun.text = string
                 binding.lastSuccessfulRun.visibility = View.VISIBLE
