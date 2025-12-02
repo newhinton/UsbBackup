@@ -115,71 +115,69 @@
                 app:srcCompat="@drawable/icon_more_vert"
                 app:tint="?attr/colorPrimary" />
 
-            <TextView
-                android:id="@+id/noPasswordTextView"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="center_vertical"
-                android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
-                android:textColor="#D00000"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/labelTarget"
-                app:layout_constraintTop_toBottomOf="@+id/target" />
-
-            <TextView
-                android:id="@+id/lastSuccessfulRun"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:visibility="invisible"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iconBg"
-                app:layout_constraintTop_toBottomOf="@+id/noPasswordTextView" />
-
-            <LinearLayout
-                android:id="@+id/layoutDiskAvailable"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/noPasswordTextView"
-                app:layout_constraintTop_toBottomOf="@+id/lastSuccessfulRun">
-
-                <ImageView
-                    android:id="@+id/imageView2"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
-                    app:srcCompat="@drawable/icon_harddisk_check"
-                    app:tint="?attr/colorPrimary" />
+                app:layout_constraintStart_toEndOf="@+id/iconBg"
+                app:layout_constraintTop_toBottomOf="@+id/moreButton">
 
                 <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="0dp"
+                    android:id="@+id/noPasswordTextView"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="@string/media_available_click_to_make_a_backup" />
+                    android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
+                    android:textColor="#D00000" />
 
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/startBackup"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/lastSuccessfulRun"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:minWidth="0dp"
-                    app:icon="@drawable/icon_backup"
-                    app:iconPadding="0dp"
-                    app:iconTint="?attr/colorOnPrimary"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
+                    android:layout_marginTop="8dp"
+                    android:text="dummy"
+                    android:visibility="visible" />
+
+                <LinearLayout
+                    android:id="@+id/layoutDiskAvailable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="48dp"
+                        android:layout_height="match_parent"
+                        app:srcCompat="@drawable/icon_harddisk_check"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/media_available_click_to_make_a_backup" />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/startBackup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:minWidth="0dp"
+                        app:icon="@drawable/icon_backup"
+                        app:iconPadding="0dp"
+                        app:iconTint="?attr/colorOnPrimary"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/sourceUriFileButton" />
+                </LinearLayout>
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

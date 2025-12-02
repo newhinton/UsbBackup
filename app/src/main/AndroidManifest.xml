@@ -49,8 +49,6 @@
                 android:resource="@xml/device_filter" />
         </activity>
 
-
-
         <activity
             android:name=".AddActivity"
             android:exported="true">
@@ -72,9 +70,9 @@
             android:name=".mediascanning.MediaBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
+                <action android:name="de.felixnuesse.usbbackup.NEW_VOLUME"/>
             </intent-filter>
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"

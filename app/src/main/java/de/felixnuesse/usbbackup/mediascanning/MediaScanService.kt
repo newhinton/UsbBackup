@@ -8,8 +8,10 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ServiceCompat
+import de.felixnuesse.usbbackup.MainActivity
 import de.felixnuesse.usbbackup.worker.BackupWorker
 import de.felixnuesse.usbbackup.worker.Notifications
+import kotlinx.coroutines.MainScope
 
 class MediaScanService : Service() {
 
@@ -37,7 +39,8 @@ class MediaScanService : Service() {
             val newDrive = scanner.getNewDrive()
             if(newDrive != null) {
                 Log.e("MediaScanService", "Found new drive: ${newDrive.uuid.toString()}")
-                BackupWorker.now(context, newDrive.uuid.toString())
+                MediaBroadcastReceiver.informAboutNewVolume(context)
+                //BackupWorker.now(context, newDrive.uuid.toString())
                 return
             } else {
                 Thread.sleep(1000)

@@ -1,11 +1,12 @@
 package de.felixnuesse.usbbackup
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.widget.PopupMenu
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
@@ -15,24 +16,25 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import de.felixnuesse.usbbackup.database.BackupTask
-import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
-import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
+import de.felixnuesse.usbbackup.mediascanning.MediaBroadcastReceiver
+import de.felixnuesse.usbbackup.mediascanning.MediaBroadcastRecieverCallback
 import de.felixnuesse.usbbackup.worker.NotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
-
+class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks, MediaBroadcastRecieverCallback {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mBackupTaskMiddleware: BackupTaskMiddleware
     private lateinit var mPreferences: Prefs
+
+    private val mConnectionReciever = MediaBroadcastReceiver(this)
 
 
     private val pushNotificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
@@ -72,15 +74,30 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
 
         mBackupTaskMiddleware = BackupTaskMiddleware.get(this)
         updateList()
+        registerReciever()
 
         NotificationWorker.schedule(this)
+
     }
 
     override fun onResume() {
         super.onResume()
         updateList()
+        registerReciever()
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == MediaBroadcastReceiver.NEW_VOLUME_BROADCAST) {
+            updateList()
+        }
+    }
+
+
+
+    fun registerReciever() {
+        registerReceiver(mConnectionReciever, MediaBroadcastReceiver.getFilter(), RECEIVER_NOT_EXPORTED)
+    }
 
     fun updateList() {
         lifecycleScope.launch {
@@ -184,5 +201,9 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks {
             }
         }
         return popupMenu
+    }
+
+    override fun onDisconnected() {
+        updateList()
     }
 }
