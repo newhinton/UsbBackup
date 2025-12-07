@@ -1,31 +1,24 @@
 package de.felixnuesse.usbbackup.worker
 
+import android.annotation.SuppressLint
+import android.app.job.JobParameters.STOP_REASON_CONSTRAINT_CONNECTIVITY
 import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
-import androidx.documentfile.provider.DocumentFile
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import de.felixnuesse.crypto.Crypto
-import de.felixnuesse.usbbackup.R
-import de.felixnuesse.usbbackup.StorageUtils
 import de.felixnuesse.usbbackup.UriUtils
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastReceiver
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastRecieverCallback
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
-import de.felixnuesse.usbbackup.fs.FsUtils
-import de.felixnuesse.usbbackup.fs.ZipUtils
-import java.io.File
-import java.io.FileOutputStream
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.UUID
-import java.util.zip.ZipOutputStream
 
 
-class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams), StateProvider {
+class BackupWorker(private var mContext: Context, workerParams: WorkerParameters): Worker(mContext, workerParams), StateProvider, MediaBroadcastRecieverCallback {
 
     companion object {
         fun now(context: Context, storageId: String) {
@@ -49,8 +42,11 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
         fun stop(context: Context, uuid: UUID) {
             Log.e("BackupWorker", "Stop Work: $uuid")
             WorkManager.getInstance(context).cancelWorkById(uuid)
+            MediaBroadcastReceiver.clear(uuid)
         }
     }
+
+    private var mBackupProcessor: BackupProcessor? = null
 
     override fun doWork(): Result {
 
@@ -72,11 +68,12 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             tasks.add(backupTaskMiddleware.get(taskId))
         }
 
-        Log.e("WORKER", "Scan tasks... ${tasks.size}")
+        Log.e("BackupWorker", "Scan tasks... Found ${tasks.size}!")
 
-
+        MediaBroadcastReceiver.registerCallback(this.id, this)
         tasks.forEach {
-            if(BackupProcessor(mContext, this).process(it)) {
+            mBackupProcessor = BackupProcessor(mContext, this)
+            if(mBackupProcessor!!.process(it)) {
                 backupTaskMiddleware.updateSuccessTimestamp(it.id!!)
             }
         }
@@ -96,6 +93,18 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
 
     override fun workerId(): UUID {
         return this.id
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun onDisconnected() {
+        Log.e("BackupWorker", "Recieved Device Disconnected call! Handling...")
+        if(mBackupProcessor?.shouldDeviceDisconnectEndTask() ?: false) {
+            this.stop(STOP_REASON_CONSTRAINT_CONNECTIVITY)
+        }
+    }
+
+    override fun onNewVolume() {
+        // unused
     }
 
 }

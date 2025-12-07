@@ -10,21 +10,33 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import de.felixnuesse.usbbackup.worker.Notifications
+import java.util.UUID
 
 
 class MediaBroadcastReceiver(): BroadcastReceiver() {
 
     companion object {
-        private var CALLBACK: MediaBroadcastRecieverCallback? = null
+        private var MAIN_ACTIVITY_CALLBACK: MediaBroadcastRecieverCallback? = null
 
         fun setCallback(callback: MediaBroadcastRecieverCallback) {
-            CALLBACK = callback
+            MAIN_ACTIVITY_CALLBACK = callback
         }
 
         fun clearCallback(callback: MediaBroadcastRecieverCallback) {
-            if(callback == CALLBACK) {
-                CALLBACK = null
+            if(callback == MAIN_ACTIVITY_CALLBACK) {
+                MAIN_ACTIVITY_CALLBACK = null
             }
+        }
+
+
+        private var WORKER_TASK_CALLBACKS: HashMap<UUID, MediaBroadcastRecieverCallback> = hashMapOf()
+
+        fun registerCallback(uuid: UUID, callback: MediaBroadcastRecieverCallback) {
+            WORKER_TASK_CALLBACKS.put(uuid, callback)
+        }
+
+        fun clear(uuid: UUID) {
+            WORKER_TASK_CALLBACKS.remove(uuid)
         }
 
         const val NEW_VOLUME_BROADCAST = "de.felixnuesse.usbbackup.NEW_VOLUME"
@@ -64,12 +76,15 @@ class MediaBroadcastReceiver(): BroadcastReceiver() {
             Notifications(context, 0).dismissSuccessNotification()
 
             Handler(Looper.getMainLooper()).postDelayed({
-                CALLBACK?.onDisconnected()
+                MAIN_ACTIVITY_CALLBACK?.onDisconnected()
+                WORKER_TASK_CALLBACKS.forEach {
+                    it.value.onDisconnected()
+                }
             }, 750)
         }
 
         if(state.isNewVolume()) {
-            CALLBACK?.onNewVolume()
+            MAIN_ACTIVITY_CALLBACK?.onNewVolume()
         }
 
     }

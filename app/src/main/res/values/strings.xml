@@ -67,6 +67,7 @@
     <string name="backup_notification_ongoing_">Zipping…</string>
     <string name="backup_notification_ongoing_failure">Backup Failure!</string>
     <string name="backup_notification_task_could_not_write_to_storage">Task: %1$s, could not write to storage: %2$s</string>
+    <string name="backup_notification_storage_was_removed">The storage for %1$s was removed prematurely. Stopping Backup!</string>
     <string name="backup_notification_ongoing_error_with_source">Error: Could not backup!</string>
     <string name="backup_notification_ongoing_error_with_source_details">There was an error backing up %1$s. We could not read the source folder!</string>
     <string name="backup_notification_ongoing_storing">Storing Folder…</string>

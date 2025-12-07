@@ -40,6 +40,9 @@
         <activity
             android:name=".FakeActivity"
             android:theme="@style/Theme.Transparent"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
             android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
