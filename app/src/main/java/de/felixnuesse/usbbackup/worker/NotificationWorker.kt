@@ -23,6 +23,8 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
 
 
     companion object {
+
+        private const val NOTIFICATION_WORKER_WORK_TAG = "NOTIFICATION_WORKER_WORK_TAG"
         private const val DAILY_HOUR_TO_RUN = 19
 
         fun now(context: Context) {
@@ -35,7 +37,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
         fun schedule(context: Context) {
 
             val manager = WorkManager.getInstance(context)
-            manager.cancelAllWork()
+            manager.cancelAllWorkByTag(NOTIFICATION_WORKER_WORK_TAG)
 
             val repeatInterval = 24L
 
@@ -61,6 +63,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
 
             workRequest.setInitialDelay(delay, TimeUnit.MILLISECONDS)
             workRequest.build()
+            workRequest.addTag(NOTIFICATION_WORKER_WORK_TAG)
 
             manager.enqueueUniquePeriodicWork("Test For Outdated Backups", ExistingPeriodicWorkPolicy.UPDATE, workRequest.build())
         }
