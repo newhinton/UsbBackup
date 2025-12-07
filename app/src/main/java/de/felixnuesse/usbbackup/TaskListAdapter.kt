@@ -135,11 +135,6 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
         fun getName(): String {
             val targetUri = task.targetUri.toUri()
             var targetUriName = getStorageLabel(mContext, targetUri)
-            val secondPart = targetUri.path?.split(":")[1]
-            if(!secondPart.isNullOrBlank()) {
-                targetUriName += ":$secondPart"
-            }
-
             val presumedFoldername = targetUri.path?.split(":")[1]
             if(!presumedFoldername.isNullOrBlank()) {
                 targetUriName += ":$presumedFoldername"
