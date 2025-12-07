@@ -8,12 +8,26 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.ServiceCompat
-import de.felixnuesse.usbbackup.MainActivity
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastReceiver
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastReceiver.Companion.NEW_VOLUME_BROADCAST
 import de.felixnuesse.usbbackup.worker.BackupWorker
 import de.felixnuesse.usbbackup.worker.Notifications
-import kotlinx.coroutines.MainScope
 
 class MediaScanService : Service() {
+
+    companion object {
+
+        fun informAboutNewVolume(context: Context) {
+            Log.e("MediaScanService", "Inform MediaBroadcastReciever about new volume!")
+            val intent = Intent(NEW_VOLUME_BROADCAST).apply {
+                setPackage("de.felixnuesse.usbbackup.broadcasts")
+                setClass(context, MediaBroadcastReceiver::class.java)
+            }
+
+            context.sendBroadcast(intent)
+        }
+
+    }
 
     override fun onBind(p0: Intent?): IBinder? {
         return null
@@ -35,12 +49,12 @@ class MediaScanService : Service() {
 
         // Simulate background work
         for (i in 1..5) {
-            Log.e("MediaScanService", "Waiting for new drive...")
+            Log.e("MediaScanService", "Waiting for new drive to be mounted…")
             val newDrive = scanner.getNewDrive()
             if(newDrive != null) {
-                Log.e("MediaScanService", "Found new drive: ${newDrive.uuid.toString()}")
-                MediaBroadcastReceiver.informAboutNewVolume(context)
-                //BackupWorker.now(context, newDrive.uuid.toString())
+                Log.e("MediaScanService", "Found new volume: ${newDrive.uuid.toString()}")
+                informAboutNewVolume(context)
+                BackupWorker.now(context, newDrive.uuid.toString())
                 return
             } else {
                 Thread.sleep(1000)

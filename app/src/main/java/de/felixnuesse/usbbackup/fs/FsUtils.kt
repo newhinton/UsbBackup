@@ -3,16 +3,16 @@ package de.felixnuesse.usbbackup.fs
 import android.content.Context
 import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import de.felixnuesse.usbbackup.worker.StateCallback
+import de.felixnuesse.usbbackup.worker.NotificationMiddleware
+import de.felixnuesse.usbbackup.worker.StateProvider
 
-class FsUtils(private var mContext: Context, private var mCallback: StateCallback) {
+class FsUtils(private var mContext: Context, private var mNotificationMiddleware: NotificationMiddleware) {
 
 
     fun copyFolder(sourceFile: DocumentFile, target: DocumentFile) {
         sourceFile.listFiles().forEach { it ->
 
-            mCallback.onProgressed("Copy...")
-            Log.e("Tag", "Processing: $${it.uri}")
+            mNotificationMiddleware.onProgressed("Copy...")
 
             if(it.isFile) {
                 writeFile(it, target.createFile("", it.name ?: "New File")!!, false)

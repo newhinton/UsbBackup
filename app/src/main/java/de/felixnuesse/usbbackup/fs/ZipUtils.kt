@@ -2,24 +2,23 @@ package de.felixnuesse.usbbackup.fs
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.documentfile.provider.DocumentFile
-import de.felixnuesse.usbbackup.worker.BackupWorker.Progress
-import de.felixnuesse.usbbackup.worker.StateCallback
+import de.felixnuesse.usbbackup.worker.NotificationMiddleware
+import de.felixnuesse.usbbackup.worker.Progress
+import de.felixnuesse.usbbackup.worker.StateProvider
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
-class ZipUtils(private var mContext: Context, private var mCallback: StateCallback) {
+class ZipUtils(private var mContext: Context, private var mStateProvider: StateProvider, private var mNotificationMiddleware: NotificationMiddleware) {
 
 
 
     fun addToZipRecursive(current: DocumentFile, zip: ZipOutputStream, path: String, progress: Progress) {
-        if(mCallback.wasStopped()) return
+        if(mStateProvider.wasStopped()) return
 
         current.listFiles().forEach {
 
-            mCallback.onProgressed("Zipping...")
-            Log.e("Tag", "Processing: $path${it.name}")
+            mNotificationMiddleware.onProgressed("Zipping...")
             if(it.isDirectory) {
                 val entry = ZipEntry("$path${it.name}/")
                 zip.putNextEntry(entry)

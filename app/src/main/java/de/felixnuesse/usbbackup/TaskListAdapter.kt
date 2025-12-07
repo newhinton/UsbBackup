@@ -1,49 +1,67 @@
 package de.felixnuesse.usbbackup
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Paint
-import android.icu.text.RelativeDateTimeFormatter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.impl.background.systemjob.setRequiredNetworkRequest
 import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
+import de.felixnuesse.usbbackup.broadcasts.BackupTaskBroadcastReciever
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
 import de.felixnuesse.usbbackup.extension.toDp
+import de.felixnuesse.usbbackup.extension.visible
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import de.felixnuesse.usbbackup.worker.BackupWorker
-import java.time.Duration
-import java.time.Instant
 
 
 class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext: Context, private val mPopupCallback: PopupCallback) : RecyclerView.Adapter<TaskListAdapter.Row>() {
 
     inner class Row(var binding: RecyclerviewTaskBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun setTask(task: BackupTask) {
+        private lateinit var task: BackupTask
+        fun updateOngoing(intent: Intent) {
+            if(task.id == intent.getIntExtra("id", -1)) {
+                binding.layoutOngoingTask.visible(true)
+                binding.progressTitle.text = intent.getStringExtra("message")
+                binding.taskProgressBar.progress = intent.getIntExtra("progress", -1)
+                binding.layoutDiskAvailable.visible(false)
+            } else {
+                binding.layoutOngoingTask.visible(false)
+                updateVisibilityOfAvailabilityLayout()
+            }
+
+        }
+
+        fun setTask(backupTask: BackupTask) {
+            this.task = backupTask
+
+            LocalBroadcastManager
+                .getInstance(mContext)
+                .registerReceiver(
+                    BackupTaskBroadcastReciever(this::updateOngoing),
+                    BackupTaskBroadcastReciever.getFilter()
+                )
+
             binding.title.text = task.name
 
-            if(!task.enabled) {
-                binding.title.paintFlags = binding.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-            }
+            updateEnabledState()
 
 
             val targetUri = task.targetUri.toUri()
-            var targetUriName = getStorageLabel(mContext, targetUri)
-            val presumedFoldername = targetUri.path?.split(":")[1]
-            if(!presumedFoldername.isNullOrBlank()) {
-                targetUriName += ":$presumedFoldername"
-            }
+            val targetUriName = getStorageLabel(mContext, targetUri) + ":"+targetUri.path?.split(":")[1]
 
             binding.source.text = task.sources.joinToString("\n") { getUriMetadata(mContext, it.uri.toUri())}
-            binding.target.text = targetUriName
+            binding.target.text = getName()
 
             val menu = getPopupMenu(binding.moreButton, task)
             binding.moreButton.setOnClickListener {
@@ -71,10 +89,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 menu.menu.findItem(R.id.taskMenuItemEnable).isVisible = true
             }
 
-
-            if(StorageUtils.get(mContext, task.targetUri.toUri()) == null && targetUriName != "primary") {
-                binding.layoutDiskAvailable.visibility = View.GONE
-            }
+            updateVisibilityOfAvailabilityLayout()
 
             binding.startBackup.setOnClickListener {
                 BackupWorker.now(mContext, task.id!!)
@@ -96,6 +111,40 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 binding.cardView.setBottomCorner(24.toDp(mContext))
             }
 
+        }
+
+        fun updateVisibilityOfAvailabilityLayout() {
+            binding.layoutDiskAvailable.visible(true)
+            val targetUriName = getName()
+            if(StorageUtils.get(mContext, task.targetUri.toUri()) == null && targetUriName != "primary") {
+                binding.layoutDiskAvailable.visibility = View.GONE
+            }
+        }
+
+        fun updateEnabledState() {
+            if(!task.enabled) {
+                binding.title.paintFlags = binding.title.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                binding.icon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.icon_cancel))
+            } else {
+                binding.title.paintFlags = binding.title.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                binding.icon.setImageDrawable(ContextCompat.getDrawable(mContext, R.drawable.cloud_download_24px))
+            }
+
+        }
+
+        fun getName(): String {
+            val targetUri = task.targetUri.toUri()
+            var targetUriName = getStorageLabel(mContext, targetUri)
+            val secondPart = targetUri.path?.split(":")[1]
+            if(!secondPart.isNullOrBlank()) {
+                targetUriName += ":$secondPart"
+            }
+
+            val presumedFoldername = targetUri.path?.split(":")[1]
+            if(!presumedFoldername.isNullOrBlank()) {
+                targetUriName += ":$presumedFoldername"
+            }
+            return targetUriName
         }
     }
 

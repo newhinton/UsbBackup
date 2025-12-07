@@ -1,7 +1,5 @@
 package de.felixnuesse.usbbackup.worker
 
-interface StateCallback {
-    fun wasStopped(): Boolean
-
+interface ProgressCallback {
     fun onProgressed(message: String)
 }

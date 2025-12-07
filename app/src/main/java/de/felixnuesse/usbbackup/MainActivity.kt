@@ -1,8 +1,6 @@
 package de.felixnuesse.usbbackup
 
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -20,8 +18,8 @@ import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
 import de.felixnuesse.usbbackup.databinding.ActivityMainBinding
 import de.felixnuesse.usbbackup.dialog.ConfirmDialog
 import de.felixnuesse.usbbackup.dialog.DialogCallbacks
-import de.felixnuesse.usbbackup.mediascanning.MediaBroadcastReceiver
-import de.felixnuesse.usbbackup.mediascanning.MediaBroadcastRecieverCallback
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastReceiver
+import de.felixnuesse.usbbackup.broadcasts.MediaBroadcastRecieverCallback
 import de.felixnuesse.usbbackup.worker.NotificationWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +32,6 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks, MediaB
     private lateinit var mBackupTaskMiddleware: BackupTaskMiddleware
     private lateinit var mPreferences: Prefs
 
-    private val mConnectionReciever = MediaBroadcastReceiver(this)
 
 
     private val pushNotificationPermissionLauncher = registerForActivityResult(RequestPermission()) { granted ->
@@ -86,17 +83,13 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks, MediaB
         registerReciever()
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        if (intent.action == MediaBroadcastReceiver.NEW_VOLUME_BROADCAST) {
-            updateList()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        MediaBroadcastReceiver.clearCallback(this)
     }
 
-
-
     fun registerReciever() {
-        registerReceiver(mConnectionReciever, MediaBroadcastReceiver.getFilter(), RECEIVER_NOT_EXPORTED)
+        MediaBroadcastReceiver.setCallback(this)
     }
 
     fun updateList() {
@@ -204,6 +197,10 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks, MediaB
     }
 
     override fun onDisconnected() {
+        updateList()
+    }
+
+    override fun onNewVolume() {
         updateList()
     }
 }

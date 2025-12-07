@@ -67,12 +67,14 @@
         </receiver>
 
         <receiver
-            android:name=".mediascanning.MediaBroadcastReceiver"
+            android:name=".broadcasts.MediaBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_DETACHED"/>
                 <action android:name="de.felixnuesse.usbbackup.NEW_VOLUME"/>
+                <action android:name="de.felixnuesse.usbbackup.UPDATE_ONGOING_TASK"/>
+                <action android:name="de.felixnuesse.usbbackup.EXIT_ONGOING_TASK"/>
             </intent-filter>
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
