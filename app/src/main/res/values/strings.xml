@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UsbBackup</string>
+    <string name="app_name" translatable="false">UsbBackup</string>
 
     <string name="donate">Donate</string>
     <string name="made_by">Made by:</string>

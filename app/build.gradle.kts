@@ -44,6 +44,13 @@ android {
         baseline = file("lint-baseline.xml")
     }
 
+    buildTypes {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+    }
+
     applicationVariants.all {
         //outputs.all { output ->
            // outputFileName = new File("backupusb-release-v"+versionName+".apk")
