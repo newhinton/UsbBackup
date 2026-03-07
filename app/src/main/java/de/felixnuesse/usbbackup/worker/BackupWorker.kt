@@ -77,6 +77,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
                 backupTaskMiddleware.updateSuccessTimestamp(it.id!!)
             }
         }
+        MediaBroadcastReceiver.clear(this.id)
 
         // always return success, because this task does not fail. Individual Parts might, but they notify you.
         return Result.success()
