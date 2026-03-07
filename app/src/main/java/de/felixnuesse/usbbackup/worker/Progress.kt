@@ -9,6 +9,10 @@ class Progress() {
     var currentPath = ""
 
     fun getProgress(): Int {
+        // prevent issue when dividing by 0. Happens with unencrypted tasks (is this accurate?)
+        if(overallSize == 0L) {
+            return 0
+        }
         val progress = (100L * calculatedSize) / overallSize
         //Log.e("Progress", "progress: ${progress.toInt()} $calculatedSize $overallSize")
         return progress.toInt()
