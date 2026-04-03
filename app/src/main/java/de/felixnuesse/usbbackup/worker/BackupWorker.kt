@@ -75,6 +75,7 @@ class BackupWorker(private var mContext: Context, workerParams: WorkerParameters
             mBackupProcessor = BackupProcessor(mContext, this)
             if(mBackupProcessor!!.process(it)) {
                 backupTaskMiddleware.updateSuccessTimestamp(it.id!!)
+                Notifications(mContext, it.id!!).dismissOutdatedBackup(it)
             }
         }
         MediaBroadcastReceiver.clear(this.id)

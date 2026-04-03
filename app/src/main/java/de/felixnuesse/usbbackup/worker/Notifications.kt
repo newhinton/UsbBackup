@@ -129,6 +129,11 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         mNotificationManager.notify(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt(), mBuilder.build())
     }
 
+    fun dismissOutdatedBackup(task: BackupTask) {
+        NotificationManagerCompat.from(mContext).areNotificationsEnabled()
+        mNotificationManager.cancel(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt())
+    }
+
 
     fun getForegroundScanNotification(): NotificationCompat.Builder {
 
