@@ -9,6 +9,7 @@
     <string name="intro_slide_notification_title">Werd Benachrichtigt!</string>
     <string name="intro_slide_notification_description">Wir zeigen dir Benachrichtigungen beim sichern. Wir spammen nicht!</string>
     <string name="intro_slide_warning_title">Warnung!</string>
+    <string name="intro_slide_warning_description">Die Verschlüsselung ist nicht geprüft worden. Sie nutzt AES-256. Benutzung auf eigene Gefahr!</string>
     <string name="intro_slide_done_title">Fertig!</string>
     <string name="intro_slide_done_description">Du kannst nun anfangen! Leg ein paar Backups an!</string>
     <string name="about">Über</string>
@@ -19,7 +20,9 @@
     <string name="password">Passwort</string>
     <string name="delete_button_for_source_item">Lösch-Schaltfläche für Quelle</string>
     <string name="starting_scan_service">Starte den Scan-Service…</string>
+    <string name="add_view_warning_timeout_helper">In Tagen. 0 für abschaltung</string>
     <string name="last_successful_run">Letzes Archiv %s</string>
+    <string name="remaining_time_til_next_run">Läuft ab: %s</string>
     <string name="about_icon_description">Icon dieser App</string>
     <string name="add_down_icon_description">Platzhalter-Icon, Pfeil der nach unten zeigt.</string>
     <string name="add_fakelistheader_encrypt">Verschlüsseln</string>
@@ -52,4 +55,5 @@
     <string name="backup_notification_done_remove_media">%1$s wurde erfolgreich archiviert. Du kannst das Speichermedium jetzt sicher entfernen.</string>
     <string name="backup_notification_unspecified_failure">Archivierungsfehler!</string>
     <string name="backup_notification_unspecified_failure_description">Aufgabe: %1$s, Fehler: %2$s</string>
+    <string name="warningTimeout">Warnzeitraum</string>
 </resources>

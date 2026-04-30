@@ -17,6 +17,7 @@ import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.broadcasts.BackupTaskBroadcastReciever
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
 import de.felixnuesse.usbbackup.extension.toDp
 import de.felixnuesse.usbbackup.extension.visible
@@ -74,6 +75,19 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 val string = mContext.getString(R.string.last_successful_run, date)
                 binding.lastSuccessfulRun.text = string
                 binding.lastSuccessfulRun.visibility = View.VISIBLE
+            }
+
+            binding.remainingTime.visibility = View.GONE
+            if(task.warningTimeout != WARNING_DISABLED) {
+
+
+                val daysSinceLastRun = DateFormatter.daysDifference(task.getLastSuccessfulBackup())
+                val dist = task.warningTimeout?.plus(daysSinceLastRun) ?: 0L
+
+                val distance = DateFormatter.relativeDays(dist)
+                val string = mContext.getString(R.string.remaining_time_til_next_run, distance)
+                binding.remainingTime.text = string
+                binding.remainingTime.visibility = View.VISIBLE
             }
 
             if(!task.containerPW.isNullOrBlank()) {

@@ -32,6 +32,7 @@
     <string name="warningTimeout">Warning Timeout</string>
     <string name="add_view_warning_timeout_helper">In Days. Enter 0 to disable.</string>
     <string name="last_successful_run">Last Archive %s</string>
+    <string name="remaining_time_til_next_run">Due: %s</string>
     <string name="about_icon_description">Icon of this App</string>
     <string name="add_down_icon_description">Spacer icon, Arrow facing downward to indicate data flowing from the above list to the selected folder below.</string>
     <string name="add_fakelistheader_encrypt">Encrypt</string>

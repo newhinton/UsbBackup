@@ -134,6 +134,15 @@
                     android:text="@string/warning_no_password_set_backup_will_be_unencrypted"
                     android:textColor="#D00000" />
 
+
+                <TextView
+                    android:id="@+id/remainingTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="dummy"
+                    android:visibility="visible" />
+
                 <TextView
                     android:id="@+id/lastSuccessfulRun"
                     android:layout_width="match_parent"
