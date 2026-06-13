@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity(), PopupCallback, DialogCallbacks, MediaB
         registerReciever()
 
         NotificationWorker.schedule(this)
+        NotificationWorker.now(this)
 
     }
 

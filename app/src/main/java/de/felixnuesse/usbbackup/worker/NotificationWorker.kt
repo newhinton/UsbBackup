@@ -31,7 +31,7 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             val request = OneTimeWorkRequestBuilder<NotificationWorker>()
             request.setInputData(workDataOf("forceRun" to true))
             request.setInitialDelay(0, TimeUnit.MILLISECONDS)
-            WorkManager.getInstance(context).enqueueUniqueWork("test", ExistingWorkPolicy.REPLACE, request.build())
+            WorkManager.getInstance(context).enqueueUniqueWork("Test For Outdated Backups", ExistingWorkPolicy.REPLACE, request.build())
         }
 
         fun schedule(context: Context) {

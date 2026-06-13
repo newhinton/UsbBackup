@@ -77,5 +77,6 @@
     <string name="backup_notification_done_remove_media">%1$s was sucessfully backed up. You can safely remove the media.</string>
     <string name="backup_notification_unspecified_failure">Backup Failure!</string>
     <string name="backup_notification_unspecified_failure_description">Task: %1$s, error: %2$s</string>
+    <string name="postpone_outdated_notification">Ignore for 14 Days</string>
 
 </resources>

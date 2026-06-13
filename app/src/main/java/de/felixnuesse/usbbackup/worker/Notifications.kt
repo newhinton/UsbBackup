@@ -12,7 +12,9 @@ import androidx.core.app.NotificationManagerCompat
 import de.felixnuesse.usbbackup.R
 import de.felixnuesse.usbbackup.database.BackupTask
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.ACTION_POSTPONE
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.ACTION_STOP
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_ID
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_UUID
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.UUID
@@ -126,7 +128,11 @@ class Notifications(private var mContext: Context, private var mId: Int) {
                     relative
                 ))
 
-        mNotificationManager.notify(NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt(), mBuilder.build())
+        val notificationId = NOTIFICATION_BACKUP_OUTDATED_ID+(task.id?: System.currentTimeMillis()).toInt()
+        mBuilder.addAction(R.drawable.icon_cancel,
+            mContext.getString(R.string.postpone_outdated_notification), getPostponeIntent(task.id!!, notificationId))
+
+        mNotificationManager.notify(notificationId, mBuilder.build())
     }
 
     fun dismissOutdatedBackup(task: BackupTask) {
@@ -150,12 +156,19 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         return mBuilder
     }
 
-
     private fun getStopIntent(): PendingIntent {
         val stopIntent = Intent(mContext, NotificationReceiver::class.java)
         stopIntent.setAction(ACTION_STOP)
         stopIntent.putExtra(EXTRA_UUID, mUuid.toString())
         return PendingIntent.getBroadcast(mContext, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun getPostponeIntent(id: Int, notificationid: Int): PendingIntent {
+        val postponeIntent = Intent(mContext, NotificationReceiver::class.java)
+        postponeIntent.setAction(ACTION_POSTPONE)
+        postponeIntent.putExtra(EXTRA_ID, id)
+        postponeIntent.putExtra(EXTRA_ID, notificationid)
+        return PendingIntent.getBroadcast(mContext, 0, postponeIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun createNotificationChannel() {
