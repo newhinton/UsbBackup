@@ -15,6 +15,7 @@ import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.ACTION_POSTPONE
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.ACTION_STOP
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_ID
+import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_NOTIFICATION_ID
 import de.felixnuesse.usbbackup.mediascanning.NotificationReceiver.Companion.EXTRA_UUID
 import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.UUID
@@ -167,7 +168,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         val postponeIntent = Intent(mContext, NotificationReceiver::class.java)
         postponeIntent.setAction(ACTION_POSTPONE)
         postponeIntent.putExtra(EXTRA_ID, id)
-        postponeIntent.putExtra(EXTRA_ID, notificationid)
+        postponeIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationid)
         return PendingIntent.getBroadcast(mContext, 0, postponeIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 

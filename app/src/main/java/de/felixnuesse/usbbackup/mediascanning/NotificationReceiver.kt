@@ -10,7 +10,6 @@ import de.felixnuesse.usbbackup.worker.BackupWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class NotificationReceiver: BroadcastReceiver() {
@@ -35,7 +34,8 @@ class NotificationReceiver: BroadcastReceiver() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 val db = BackupTaskMiddleware.get(context)
-                val task = db.get(intent.getIntExtra(EXTRA_ID, -1))
+                val intentTaskId = intent.getIntExtra(EXTRA_ID, -1)
+                val task = db.get(intentTaskId)
                 task.lastSuccessfulBackup = task.lastSuccessfulBackup?.plus(days14)
                 db.update(task)
                 notificationManager.cancel(intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1))
