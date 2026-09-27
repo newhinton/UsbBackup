@@ -38,7 +38,9 @@ class NotificationReceiver: BroadcastReceiver() {
                 val task = db.get(intentTaskId)
                 task.lastSuccessfulBackup = task.lastSuccessfulBackup?.plus(days14)
                 db.update(task)
-                notificationManager.cancel(intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1))
+
+                val notificationToCancel = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)
+                notificationManager.cancel(notificationToCancel)
             }
         }
     }
