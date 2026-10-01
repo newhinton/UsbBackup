@@ -2,11 +2,9 @@ package de.felixnuesse.usbbackup.worker
 
 import android.content.Context
 import android.util.Log
-import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import androidx.work.Worker
@@ -15,7 +13,6 @@ import androidx.work.workDataOf
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.database.BackupTaskMiddleware
-import de.felixnuesse.usbbackup.utils.DateFormatter
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -72,7 +69,8 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
     override fun doWork(): Result {
         val backupTaskMiddleware = BackupTaskMiddleware.get(mContext)
         backupTaskMiddleware.getAll().forEach {
-            // dont warn when we don't have a warning
+            Log.e("NotificationReceiver", "Task ${it.name} ${it.nextReminder}")
+            // don't warn when we don't have a warning
             if(it.warningTimeout == WARNING_DISABLED) {
                 return@forEach
             }
@@ -81,10 +79,11 @@ class NotificationWorker (private var mContext: Context, workerParams: WorkerPar
             if(it.lastSuccessfulBackup == NEVER) {
                 return@forEach
             }
+            Log.e("NotificationReceiver", "Task ${it.name} ${it.nextReminder}")
 
-            val daysSinceLastRun = DateFormatter.daysDifference(it.getLastSuccessfulBackup()) * -1
-            if(daysSinceLastRun < it.getWarningTimeout()) {
-                // the timeout is bigger than the passed time since the last run
+            val nextReminder = it.getNextReminderTimestamp()
+            if(System.currentTimeMillis() < nextReminder) {
+                // the timestamp for the next reminder is not yet in the past
                 return@forEach
             }
 

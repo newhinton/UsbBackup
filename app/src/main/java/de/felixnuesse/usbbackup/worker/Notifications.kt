@@ -169,7 +169,7 @@ class Notifications(private var mContext: Context, private var mId: Int) {
         postponeIntent.setAction(ACTION_POSTPONE)
         postponeIntent.putExtra(EXTRA_ID, id)
         postponeIntent.putExtra(EXTRA_NOTIFICATION_ID, notificationid)
-        return PendingIntent.getBroadcast(mContext, 0, postponeIntent, PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getBroadcast(mContext, notificationid, postponeIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     private fun createNotificationChannel() {

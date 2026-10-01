@@ -64,6 +64,9 @@ class BackupTaskMiddleware(private var backupDao: BackupTaskDao, private var sou
     fun updateSuccessTimestamp(id: Int) {
         val entry = get(id)
         entry.lastSuccessfulBackup = System.currentTimeMillis()
+        val days = 24 * 60 * 60 * 1000L
+        val warningOffset = (entry.warningTimeout?: 0L) * days
+        entry.nextReminder = entry.lastSuccessfulBackup?.plus(warningOffset)
         update(entry)
     }
 

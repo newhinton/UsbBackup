@@ -36,7 +36,7 @@ class NotificationReceiver: BroadcastReceiver() {
                 val db = BackupTaskMiddleware.get(context)
                 val intentTaskId = intent.getIntExtra(EXTRA_ID, -1)
                 val task = db.get(intentTaskId)
-                task.lastSuccessfulBackup = task.lastSuccessfulBackup?.plus(days14)
+                task.nextReminder = System.currentTimeMillis().plus(days14)
                 db.update(task)
 
                 val notificationToCancel = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1)

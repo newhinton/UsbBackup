@@ -13,7 +13,8 @@ data class BackupTask (
     @ColumnInfo(name = "containerPW") var containerPW: String?,
     @ColumnInfo(name = "enabled") var enabled: Boolean,
     @ColumnInfo(name = "lastSuccessfulBackup") var lastSuccessfulBackup: Long? = NEVER,
-    @ColumnInfo(name = "warningTimeout") var warningTimeout: Long? = WARNING_DISABLED
+    @ColumnInfo(name = "warningTimeout") var warningTimeout: Long? = WARNING_DISABLED,
+    @ColumnInfo(name = "nextReminder") var nextReminder: Long? = NEVER,
 ) {
 
     @Ignore var sources: ArrayList<Source> = arrayListOf()
@@ -24,6 +25,10 @@ data class BackupTask (
 
     @Ignore fun getWarningTimeout(): Long {
         return warningTimeout?: WARNING_DISABLED
+    }
+
+    @Ignore fun getNextReminderTimestamp(): Long {
+        return nextReminder?: NEVER
     }
 
 
