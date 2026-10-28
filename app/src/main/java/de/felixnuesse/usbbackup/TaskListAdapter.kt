@@ -17,6 +17,7 @@ import de.felixnuesse.usbbackup.UriUtils.Companion.getStorageLabel
 import de.felixnuesse.usbbackup.UriUtils.Companion.getUriMetadata
 import de.felixnuesse.usbbackup.broadcasts.BackupTaskBroadcastReciever
 import de.felixnuesse.usbbackup.database.BackupTask
+import de.felixnuesse.usbbackup.database.BackupTask.Companion.NEVER
 import de.felixnuesse.usbbackup.database.BackupTask.Companion.WARNING_DISABLED
 import de.felixnuesse.usbbackup.databinding.RecyclerviewTaskBinding
 import de.felixnuesse.usbbackup.extension.toDp
@@ -70,7 +71,7 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
             }
 
             binding.lastSuccessfulRun.visibility = View.GONE
-            if(task.lastSuccessfulBackup != BackupTask.NEVER) {
+            if(task.lastSuccessfulBackup != NEVER) {
                 val date = DateFormatter.relative(task.getLastSuccessfulBackup())
                 val string = mContext.getString(R.string.last_successful_run, date)
                 binding.lastSuccessfulRun.text = string
@@ -88,6 +89,14 @@ class TaskListAdapter(private val tasks: List<BackupTask>, private val mContext:
                 val string = mContext.getString(R.string.remaining_time_til_next_run, distance)
                 binding.remainingTime.text = string
                 binding.remainingTime.visibility = View.VISIBLE
+            }
+
+            binding.nextReminder.visibility = View.GONE
+            if(task.nextReminder != NEVER) {
+                val date = DateFormatter.relative(task.getNextReminderTimestamp())
+                val string = mContext.getString(R.string.next_reminder, date)
+                binding.nextReminder.text = string
+                binding.nextReminder.visibility = View.VISIBLE
             }
 
             if(!task.containerPW.isNullOrBlank()) {

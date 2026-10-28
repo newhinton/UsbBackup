@@ -22,6 +22,7 @@
     <string name="starting_scan_service">Starte den Scan-Service…</string>
     <string name="add_view_warning_timeout_helper">In Tagen. 0 für abschaltung</string>
     <string name="last_successful_run">Letzes Archiv %s</string>
+    <string name="next_reminder">Nächste Erinnerung: %s</string>
     <string name="remaining_time_til_next_run">Läuft ab: %s</string>
     <string name="about_icon_description">Icon dieser App</string>
     <string name="add_down_icon_description">Platzhalter-Icon, Pfeil der nach unten zeigt.</string>

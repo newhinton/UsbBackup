@@ -144,6 +144,14 @@
                     android:visibility="visible" />
 
                 <TextView
+                    android:id="@+id/nextReminder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="dummy"
+                    android:visibility="gone" />
+
+                <TextView
                     android:id="@+id/lastSuccessfulRun"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
